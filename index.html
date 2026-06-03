@@ -1,0 +1,5079 @@
+<!DOCTYPE html>
+<html lang="ko" theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>퍼니스낵 재고관리 시스템</title>
+  
+  <!-- Google Fonts: Outfit & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- SheetJS CDN for Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  
+  <!-- HTML5-QRCode Scanner for Barcode Scanning -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+  <style>
+    /* Premium CSS Design System */
+    :root[theme="dark"] {
+      --bg: #0b0f19;
+      --card-bg: rgba(21, 31, 50, 0.85);
+      --card-bg-solid: #151f32;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(251, 191, 36, 0.5);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #fbbf24;
+      --primary-hover: #f59e0b;
+      --primary-rgb: 251, 191, 36;
+      --accent: #6366f1;
+      --accent-muted: rgba(99, 102, 241, 0.15);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.15);
+      --warning: #f97316;
+      --warning-bg: rgba(249, 115, 22, 0.15);
+      --alert: #eab308;
+      --alert-bg: rgba(234, 179, 8, 0.15);
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --card-header: rgba(30, 41, 59, 0.4);
+      --input-bg: #0f172a;
+      --shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+      --sidebar-bg: #0d1321;
+    }
+
+    :root[theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-bg-solid: #ffffff;
+      --border-color: rgba(226, 232, 240, 1);
+      --border-focus: rgba(217, 119, 6, 0.5);
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #d97706;
+      --primary-hover: #b45309;
+      --primary-rgb: 217, 119, 6;
+      --accent: #4f46e5;
+      --accent-muted: rgba(79, 70, 229, 0.1);
+      --danger: #dc2626;
+      --danger-bg: rgba(220, 38, 38, 0.1);
+      --warning: #ea580c;
+      --warning-bg: rgba(234, 88, 12, 0.1);
+      --alert: #ca8a04;
+      --alert-bg: rgba(202, 138, 4, 0.1);
+      --success: #16a34a;
+      --success-bg: rgba(22, 163, 74, 0.1);
+      --card-header: rgba(241, 245, 249, 0.8);
+      --input-bg: #ffffff;
+      --shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+      --sidebar-bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Layout Structure */
+    .app-container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Sidebar Navigation */
+    aside.sidebar {
+      width: 260px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 50;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #0b0f19;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, var(--text), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    nav.nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+      background-color: var(--border-color);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05));
+      color: var(--primary);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .sidebar-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .theme-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Main Content Area */
+    main.main-content {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* Mobile Top Nav / Bottom Nav */
+    .mobile-header {
+      display: none;
+      background-color: var(--sidebar-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--sidebar-bg);
+      border-top: 1px solid var(--border-color);
+      padding: 10px 0;
+      z-index: 100;
+      justify-content: space-around;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 10px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .mobile-nav-item.active {
+      color: var(--primary);
+    }
+
+    /* UI Cards and Layout components */
+    .page-section {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .page-section.active {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Glassmorphism Card */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .glass-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    /* Form Elements */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--border-focus);
+    }
+
+    .input-with-icon {
+      position: relative;
+    }
+
+    .input-with-icon input {
+      padding-right: 48px;
+    }
+
+    .input-icon-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+    }
+
+    .input-icon-btn:hover {
+      background-color: var(--border-color);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #0b0f19;
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+    }
+
+    .btn-secondary {
+      background-color: var(--border-color);
+      color: var(--text);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255,255,255,0.05);
+    }
+
+    .btn-accent {
+      background-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-accent:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: #ffffff;
+    }
+
+    .btn-icon-only {
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    /* Drop Zone for File Uploads */
+    .upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: 16px;
+      padding: 32px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      background-color: rgba(255,255,255,0.01);
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--primary);
+      background-color: rgba(251, 191, 36, 0.03);
+    }
+
+    .upload-icon {
+      color: var(--primary);
+      background-color: var(--accent-muted);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-preview {
+      max-width: 100%;
+      max-height: 120px;
+      border-radius: 10px;
+      object-fit: contain;
+      display: none;
+      margin-top: 8px;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--card-bg-solid);
+      border-left: 4px solid var(--primary);
+      color: var(--text);
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+      max-width: 400px;
+      transform: translateX(120%);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast-success { border-left-color: var(--success); }
+    .toast-danger { border-left-color: var(--danger); }
+    .toast-warning { border-left-color: var(--warning); }
+
+    /* Tags and Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-danger { background-color: var(--danger-bg); color: var(--danger); }
+    .badge-warning { background-color: var(--warning-bg); color: var(--warning); }
+    .badge-alert { background-color: var(--alert-bg); color: var(--alert); }
+    .badge-success { background-color: var(--success-bg); color: var(--success); }
+
+    /* Category Filter Chips */
+    .filter-scroll-wrapper {
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .chip {
+      padding: 8px 16px;
+      border-radius: 30px;
+      background-color: var(--card-bg-solid);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip:hover {
+      background-color: var(--border-color);
+      color: var(--text);
+    }
+
+    .chip.active {
+      background-color: var(--primary);
+      color: #0b0f19;
+      border-color: var(--primary);
+    }
+
+    /* Inventory Dashboard Grid & Cards */
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .inventory-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .inventory-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+      border-color: rgba(var(--primary-rgb), 0.3);
+    }
+
+    .card-fav-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .card-fav-btn.active {
+      color: #fbbf24;
+    }
+
+    .product-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .product-title {
+      font-size: 17px;
+      font-weight: 700;
+      padding-right: 24px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .supplier-badge {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .inventory-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 0;
+    }
+
+    .stock-amount-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stock-amount {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .price-details {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .profit-pill {
+      background-color: var(--accent-muted);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      display: inline-block;
+      font-size: 11px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .card-actions button {
+      flex: 1;
+    }
+
+    /* Modal Styling */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(11, 15, 25, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg-solid);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      overflow: hidden;
+      animation: modalSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.175);
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 24px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Table Design */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: var(--card-header);
+      padding: 12px 16px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Prevent text and numbers from being cut off in tables */
+    .table-container th,
+    .table-container td,
+    .table-wrapper th,
+    .table-wrapper td {
+      white-space: nowrap;
+    }
+
+    /* Table Input Fields Sizing & Min-widths to avoid collapsing */
+    table input[type="text"],
+    table input[type="number"],
+    table input[type="date"],
+    table select {
+      padding: 6px 10px !important;
+      font-size: 13px !important;
+      height: 34px !important;
+      border-radius: 6px !important;
+      box-sizing: border-box;
+    }
+
+    table input[type="date"] {
+      min-width: 135px !important;
+    }
+    table select {
+      min-width: 110px !important;
+    }
+    table input[type="number"] {
+      min-width: 80px !important;
+    }
+    table input[type="text"] {
+      min-width: 140px !important;
+    }
+
+    /* Loading Spinner */
+    .spinner-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(11, 15, 25, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 10;
+      border-radius: 20px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border-color);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Barcode reader block */
+    #barcode-reader-container {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* Analytics Dashboard Styling */
+    .stat-widget {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-val {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    /* Favorite Quick Add List */
+    .quick-fav-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .fav-item-btn {
+      padding: 10px 16px;
+      border-radius: 12px;
+      background-color: var(--accent-muted);
+      color: var(--text);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .fav-item-btn:hover {
+      background-color: var(--primary);
+      color: #0b0f19;
+      border-color: var(--primary);
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 1023px) {
+      aside.sidebar {
+        display: none;
+      }
+      .mobile-header {
+        display: flex;
+      }
+      .mobile-nav {
+        display: flex;
+      }
+      main.main-content {
+        padding: 20px;
+        padding-bottom: 80px; /* Safe space for mobile bottom nav */
+        gap: 20px;
+      }
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <div class="logo-container" style="margin-bottom: 0;">
+      <div class="logo-icon">FS</div>
+      <span class="logo-text">퍼니스낵 재고관리</span>
+    </div>
+    <button class="theme-toggle-btn btn-icon-only" onclick="toggleTheme()" aria-label="테마 전환">
+      <i data-lucide="sun" id="mobile-theme-icon"></i>
+    </button>
+  </header>
+
+  <!-- App Wrapper -->
+  <div class="app-container">
+
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-container">
+        <div class="logo-icon">FS</div>
+        <span class="logo-text">퍼니스낵 재고관리</span>
+      </div>
+
+      <nav class="nav-menu">
+        <a class="nav-item active" onclick="switchTab('stock-entry-tab', this)">
+          <i data-lucide="package-plus"></i>
+          <span>입고 등록</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('inventory-tab', this)">
+          <i data-lucide="boxes"></i>
+          <span>입고 현황</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('analytics-tab', this)">
+          <i data-lucide="line-chart"></i>
+          <span>인기 및 통계</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('finance-tab', this)">
+          <i data-lucide="wallet"></i>
+          <span>재무 현황</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('settings-tab', this)">
+          <i data-lucide="settings"></i>
+          <span>설정 및 백업</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="theme-toggle-btn" onclick="toggleTheme()">
+          <span>화면 모드</span>
+          <i data-lucide="sun" id="sidebar-theme-icon"></i>
+        </button>
+        <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
+          v1.0.0 &copy; 2026 FunnySnack
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- ============================================== -->
+      <!-- TAB 1: STOCK ENTRY (입고 등록) -->
+      <!-- ============================================== -->
+      <section id="stock-entry-tab" class="page-section active">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">입고 등록</h1>
+            <p class="section-desc">사진 촬영으로 입고 내역을 자동 분석하거나 직접 등록하세요.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Left: AI Scan & Favorite Quick List -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div class="glass-card" id="ai-scan-card">
+              <div class="glass-card-header">
+                <div class="card-title">
+                  <i data-lucide="cpu" style="color: var(--primary);"></i>
+                  <span>AI 영수증 / 라벨 분석</span>
+                </div>
+                <span class="badge badge-success">Gemini 2.5 Flash</span>
+              </div>
+              
+              <div class="grid-2" style="gap: 16px; margin-bottom: 20px;">
+                <div class="upload-area" id="receipt-dropzone" onclick="triggerFileInput('receipt-input')">
+                  <div class="upload-icon"><i data-lucide="receipt"></i></div>
+                  <div style="font-size: 13px; font-weight: 600;">영수증 업로드</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택</div>
+                  <input type="file" id="receipt-input" accept="image/*,application/pdf" style="display: none;" onchange="handleFileSelected(this, 'receipt')">
+                  <img id="receipt-preview" class="upload-preview" alt="미리보기">
+                </div>
+                <div class="upload-area" id="label-dropzone" onclick="triggerFileInput('label-input')">
+                  <div class="upload-icon"><i data-lucide="calendar"></i></div>
+                  <div style="font-size: 13px; font-weight: 600;">유통기한 라벨 업로드</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택</div>
+                  <input type="file" id="label-input" accept="image/*" style="display: none;" onchange="handleFileSelected(this, 'label')">
+                  <img id="label-preview" class="upload-preview" alt="미리보기">
+                </div>
+              </div>
+
+              <!-- Default Category Option Selection for AI Scan -->
+              <div style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
+                  <i data-lucide="tag" style="width: 14px; height: 14px; color: var(--primary);"></i>
+                  <span>기본 카테고리 지정 (선택)</span>
+                </label>
+                <select id="ai-default-category" style="width: 100%; height: 38px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); outline: none; transition: border-color 0.2s;">
+                  <option value="">(자동 분류 또는 선택 안 함)</option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary" style="width: 100%;" onclick="runAiAnalysis()">
+                <i data-lucide="sparkles"></i>
+                <span>AI 분석 시작하기</span>
+              </button>
+
+              <div id="ai-loading" class="spinner-overlay" style="display: none;">
+                <div class="spinner"></div>
+                <div style="font-weight: 700; color: #fff;">Gemini AI가 이미지를 분석 중입니다...</div>
+                <div style="font-size: 12px; color: #94a3b8;">영수증 품목명, 단가, 수량, 유통기한 추출 중</div>
+              </div>
+            </div>
+
+            <!-- Favorite Quick Add -->
+            <div class="glass-card">
+              <div class="glass-card-header">
+                <div class="card-title">
+                  <i data-lucide="star" style="color: #fbbf24;"></i>
+                  <span>자주 입고되는 품목 (즐겨찾기)</span>
+                </div>
+              </div>
+              <div class="quick-fav-list" id="quick-favorites-container">
+                <!-- Dynamic Content -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Manual Entry Form -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="keyboard" style="color: var(--primary);"></i>
+                <span>직접 입고 등록</span>
+              </div>
+            </div>
+
+            <form id="manual-stock-form" onsubmit="handleManualStockSubmit(event)">
+              <div class="grid-2">
+                <div class="form-group">
+                  <label for="stock-supplier">납품처 *</label>
+                  <select id="stock-supplier" required onchange="adaptCategoriesBySupplier()">
+                    <!-- Options populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="stock-category">카테고리 *</label>
+                  <select id="stock-category" required>
+                    <!-- Options populated dynamically -->
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="stock-barcode">바코드</label>
+                <div class="input-with-icon">
+                  <input type="text" id="stock-barcode" placeholder="스캔 또는 직접 입력">
+                  <button type="button" class="input-icon-btn" onclick="openBarcodeScanner('stock-barcode')" title="바코드 스캔">
+                    <i data-lucide="scan-line"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="stock-name">품목명 *</label>
+                <input type="text" id="stock-name" required placeholder="예: 메로나, 코카콜라">
+              </div>
+
+              <div class="grid-3">
+                <div class="form-group">
+                  <label for="stock-qty">입고 수량 *</label>
+                  <input type="number" id="stock-qty" required min="1" placeholder="개수" value="10">
+                </div>
+                <div class="form-group">
+                  <label for="stock-purchase-price">매입 단가 (원) *</label>
+                  <input type="number" id="stock-purchase-price" required min="0" placeholder="개당 매입가" value="500" oninput="calculateProfitMargin('manual')">
+                </div>
+                <div class="form-group">
+                  <label for="stock-selling-price">판매가 (원) *</label>
+                  <input type="number" id="stock-selling-price" required min="0" placeholder="소비자가" value="1000" oninput="calculateProfitMargin('manual')">
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label for="stock-expiry-date">유통기한 *</label>
+                  <input type="date" id="stock-expiry-date" required>
+                </div>
+                <div class="form-group">
+                  <label>마진율 / 수익률</label>
+                  <div id="manual-profit-display" style="padding: 12px 0; font-size: 16px; font-weight: 800; color: var(--success);">
+                    50.0%
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="stock-note">메모</label>
+                <textarea id="stock-note" rows="2" placeholder="참고사항 입력"></textarea>
+              </div>
+
+              <div style="display: flex; gap: 12px; margin-top: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="resetManualForm()">초기화</button>
+                <button type="submit" class="btn btn-primary" style="flex: 1;">재고 저장하기</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Verification Results Block from AI Scan -->
+        <div class="glass-card" id="ai-verification-card" style="display: none;">
+          <div class="glass-card-header">
+            <div class="card-title">
+              <i data-lucide="check-square" style="color: var(--success);"></i>
+              <span>AI 분석 결과 검증 및 저장</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="closeVerificationCard()">닫기</button>
+          </div>
+
+          <p class="section-desc" style="margin-bottom: 16px;">
+            Gemini가 영수증에서 품목을 추출했습니다. 내용을 확인하고 수정한 뒤 저장 버튼을 눌러주세요.
+          </p>
+
+          <div class="table-container" style="margin-bottom: 20px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>납품처</th>
+                  <th>카테고리</th>
+                  <th>품목명</th>
+                  <th style="width: 90px;">수량</th>
+                  <th style="width: 110px;">매입가</th>
+                  <th style="width: 110px;">판매가</th>
+                  <th>유통기한</th>
+                  <th>수익률</th>
+                  <th style="width: 80px;">액션</th>
+                </tr>
+              </thead>
+              <tbody id="ai-verification-tbody">
+                <!-- Dynamically injected rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button class="btn btn-secondary" onclick="closeVerificationCard()">취소</button>
+            <button class="btn btn-accent" onclick="saveAllVerifiedItems()">검증된 품목 일괄 저장</button>
+          </div>
+        </div>
+
+        <!-- Recent Stock Ins -->
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <div class="card-title">
+              <i data-lucide="history"></i>
+              <span>최근 입고 내역 (최근 5건)</span>
+            </div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>입고일자</th>
+                  <th>품목명</th>
+                  <th>카테고리</th>
+                  <th>수량</th>
+                  <th>매입단가</th>
+                  <th>유통기한</th>
+                  <th>납품처</th>
+                </tr>
+              </thead>
+              <tbody id="recent-stockins-tbody">
+                <!-- Populate dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: STOCK IN HISTORY & EXPIRY (입고 현황) -->
+      <!-- ============================================== -->
+      <section id="inventory-tab" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">입고 및 유통기한 현황</h1>
+            <p class="section-desc">입고된 배치별 품목 리스트와 유통기한을 파악하고 관리합니다.</p>
+          </div>
+          <div>
+            <button class="btn btn-accent btn-sm" onclick="exportToExcel()">
+              <i data-lucide="download"></i>
+              <span>엑셀 다운로드</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="glass-card" style="padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="grid-4" style="gap: 16px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="search-input">품목 검색 (초성 지원 / 바코드)</label>
+              <div class="input-with-icon">
+                <input type="text" id="search-input" placeholder="이름, 초성(예: ㅁㄹㄴ), 바코드 입력" oninput="renderInventory()">
+                <button type="button" class="input-icon-btn" onclick="openBarcodeScanner('search-input')" title="바코드 스캔">
+                  <i data-lucide="scan-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filter-status">보관 상태</label>
+              <select id="filter-status" onchange="renderInventory()">
+                <option value="active">보관 중 (대기)</option>
+                <option value="archived">소진/폐기 완료</option>
+                <option value="all">전체 내역</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filter-supplier">납품처 필터</label>
+              <select id="filter-supplier" onchange="renderInventory()">
+                <option value="all">전체 납품처</option>
+                <!-- Filled dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="sort-select">정렬 기준</label>
+              <select id="sort-select" onchange="renderInventory()">
+                <option value="expiry_asc">유통기한 임박순 (추천)</option>
+                <option value="expiry_desc">유통기한 넉넉한순</option>
+                <option value="qty_asc">입고량 적은순</option>
+                <option value="qty_desc">입고량 많은순</option>
+                <option value="profit_desc">수익률 높은순</option>
+                <option value="name_asc">이름 가나다순</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Category Chips -->
+          <div class="filter-scroll-wrapper">
+            <div class="filter-chips" id="inventory-category-chips">
+              <!-- Dynamically populated category chips -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory List Grid -->
+        <div class="inventory-grid" id="inventory-grid-container">
+          <!-- Dynamically generated inventory cards -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: POPULARITY & STATISTICS (인기 및 통계) -->
+      <!-- ============================================== -->
+      <section id="analytics-tab" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">인기상품 및 통계</h1>
+            <p class="section-desc">입고 및 판매 이력을 바탕으로 매장 운영 지표를 시각화합니다.</p>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid-4" id="stats-summary-grid">
+          <div class="glass-card stat-widget">
+            <div style="font-size: 13px; color: var(--text-muted); font-weight:600;">등록 품목수</div>
+            <div class="stat-val" id="stat-total-products">0</div>
+            <div style="font-size: 11px; color: var(--text-muted);">고유 품목 기준</div>
+          </div>
+          <div class="glass-card stat-widget">
+            <div style="font-size: 13px; color: var(--text-muted); font-weight:600;">보관 중 수량</div>
+            <div class="stat-val" id="stat-total-qty">0</div>
+            <div style="font-size: 11px; color: var(--text-muted);">보관 중인 품목 수량 합계</div>
+          </div>
+          <div class="glass-card stat-widget">
+            <div style="font-size: 13px; color: var(--text-muted); font-weight:600;">보관 자산 (매입가)</div>
+            <div class="stat-val" id="stat-total-assets" style="color: var(--primary);">₩0</div>
+            <div style="font-size: 11px; color: var(--text-muted);">보관 중 품목의 매입가 합계</div>
+          </div>
+          <div class="glass-card stat-widget">
+            <div style="font-size: 13px; color: var(--text-muted); font-weight:600;">예상 판매가 및 마진</div>
+            <div class="stat-val" id="stat-total-revenue" style="color: var(--success);">₩0</div>
+            <div style="font-size: 11px; color: var(--success);" id="stat-avg-margin">평균 마진: 0%</div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid-2">
+          <!-- Popular Items Chart -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="bar-chart-3" style="color: var(--primary);"></i>
+                <span>품목별 누적 입고 횟수 순위</span>
+              </div>
+            </div>
+            <div style="position: relative; height: 300px; width: 100%;">
+              <canvas id="popular-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Category Doughnut -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="pie-chart" style="color: var(--accent);"></i>
+                <span>카테고리별 보관 분포</span>
+              </div>
+            </div>
+            <div style="position: relative; height: 300px; width: 100%; display:flex; justify-content:center;">
+              <canvas id="category-chart" style="max-width:300px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Profit comparisons -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="trending-up" style="color: var(--success);"></i>
+                <span>카테고리별 수익률 비교 (%)</span>
+              </div>
+            </div>
+            <div style="position: relative; height: 300px; width: 100%;">
+              <canvas id="profit-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Restock analysis -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="refresh-cw" style="color: var(--warning);"></i>
+                <span>입고 주기 분석 (평균 납품 간격)</span>
+              </div>
+            </div>
+            <div class="table-container" style="max-height: 300px; overflow-y:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>품목명</th>
+                    <th>카테고리</th>
+                    <th>최근 입고일</th>
+                    <th>평균 주기</th>
+                    <th>상태</th>
+                  </tr>
+                </thead>
+                <tbody id="reorder-analysis-tbody">
+                  <!-- Dynamic elements -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 5: FINANCIAL MANAGEMENT (재무 현황) -->
+      <!-- ============================================== -->
+      <section id="finance-tab" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">재무 현황</h1>
+            <p class="section-desc">통장 거래 내역을 AI로 판독하고, 월별 손익 분석 및 영수증 대사를 수행합니다.</p>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 24px;">
+          <!-- Left: AI Scan Card -->
+          <div class="glass-card" id="bank-scan-card" style="position: relative;">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="cpu" style="color: var(--primary);"></i>
+                <span>통장 내역 AI 분석</span>
+              </div>
+              <span class="badge badge-success">Gemini 2.5 Flash</span>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label" for="bank-scan-month">대사 대상 월 선택 <span style="color: var(--danger);">*</span></label>
+              <input type="month" id="bank-scan-month" class="form-input">
+            </div>
+
+            <div class="upload-area" id="bank-dropzone" onclick="triggerFileInput('bank-input')" style="margin-bottom: 16px; height: 130px;">
+              <div class="upload-icon"><i data-lucide="file-text"></i></div>
+              <div style="font-size: 13px; font-weight: 600;">통장 거래 내역 사진 업로드</div>
+              <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택 (영업 거래 목록)</div>
+              <input type="file" id="bank-input" accept="image/*,application/pdf" style="display: none;" onchange="handleFileSelected(this, 'bank')">
+              <img id="bank-preview" class="upload-preview" alt="미리보기">
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary" style="flex: 1;" onclick="runBankAiAnalysis()">
+                <i data-lucide="sparkles"></i>
+                <span>AI 판독 시작</span>
+              </button>
+              <button class="btn btn-secondary" onclick="openManualBankModal()">
+                <i data-lucide="plus"></i>
+                <span>수동 입력</span>
+              </button>
+            </div>
+
+            <div id="bank-ai-loading" class="spinner-overlay" style="display: none; border-radius: 16px;">
+              <div class="spinner"></div>
+              <div style="font-weight: 700; color: #fff;">Gemini AI가 통장을 분석 중입니다...</div>
+              <div style="font-size: 12px; color: #94a3b8;">날짜, 금액, 입/출금 구분, 적요 추출 중</div>
+            </div>
+          </div>
+
+          <!-- Right: Summary Dashboard -->
+          <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="wallet" style="color: var(--accent);"></i>
+                <span>월별 요약 정보</span>
+              </div>
+              <select id="finance-summary-month" class="form-input" style="width: auto; padding: 4px 10px; font-size: 12px; height: auto;" onchange="renderFinanceTab()">
+                <!-- Dynamic options like 2026-05 -->
+              </select>
+            </div>
+            
+            <div class="grid-3" style="gap: 16px; margin: 16px 0;">
+              <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); padding: 16px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">총 수입 (입금)</div>
+                <div id="finance-total-income" style="font-size: 18px; font-weight: 700; color: var(--success);">0원</div>
+              </div>
+              <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 16px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">총 지출 (출금)</div>
+                <div id="finance-total-expense" style="font-size: 18px; font-weight: 700; color: var(--danger);">0원</div>
+              </div>
+              <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.15); padding: 16px; border-radius: 12px; text-align: center;" id="finance-net-card">
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">실제 순이익</div>
+                <div id="finance-total-net" style="font-size: 18px; font-weight: 700; color: var(--primary);">0원</div>
+              </div>
+            </div>
+
+            <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; font-size: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: var(--text-muted);">연간 총 수입:</span>
+                <span id="yearly-total-income" style="font-weight: 600; color: var(--text);">0원</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: var(--text-muted);">연간 총 지출:</span>
+                <span id="yearly-total-expense" style="font-weight: 600; color: var(--text);">0원</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">연간 누적 순이익:</span>
+                <span id="yearly-accum-net" style="font-weight: 700; color: var(--primary);">0원</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Charts Section -->
+        <div class="grid-2" style="margin-bottom: 24px;">
+          <!-- Chart 1: Income vs Expense Grouped Bar Chart -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="bar-chart-3" style="color: var(--success);"></i>
+                <span>월별 수입/지출 비교</span>
+              </div>
+              <select id="chart-year-filter" class="form-input" style="width: auto; padding: 4px 10px; font-size: 12px; height: auto;" onchange="renderFinanceTab()">
+                <option value="2026">2026년</option>
+              </select>
+            </div>
+            <div style="position: relative; height: 260px; width: 100%;">
+              <canvas id="income-expense-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 2: Net Profit Trend Line Chart -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="trending-up" style="color: var(--primary);"></i>
+                <span>월별 순이익 추이</span>
+              </div>
+            </div>
+            <div style="position: relative; height: 260px; width: 100%;">
+              <canvas id="net-profit-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Receipt vs Bank Reconciliation Section -->
+        <div class="glass-card" style="margin-bottom: 24px;">
+          <div class="glass-card-header" style="flex-wrap: wrap; gap: 12px;">
+            <div class="card-title">
+              <i data-lucide="check-square" style="color: var(--success);"></i>
+              <span>영수증 vs 통장 지출 대사 (누락 감지)</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <select id="reconcile-month-filter" class="form-input" style="width: auto; padding: 6px 12px; font-size: 13px;">
+                <!-- Dynamic months -->
+              </select>
+              <button class="btn btn-primary" onclick="runReconciliation()">
+                <i data-lucide="refresh-cw"></i>
+                <span>대사 실행</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recon Summary stats -->
+          <div class="grid-4" style="gap: 16px; margin: 16px 0;" id="recon-stats-row">
+            <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">대상 입고 영수증</div>
+              <div id="recon-stat-total" style="font-size: 16px; font-weight: 700;">0건</div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 11px; color: var(--success); margin-bottom: 2px;">✅ 매칭 완료</div>
+              <div id="recon-stat-matched" style="font-size: 16px; font-weight: 700; color: var(--success);">0건</div>
+            </div>
+            <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 11px; color: var(--primary); margin-bottom: 2px;">⚠️ 금액 불일치</div>
+              <div id="recon-stat-diff" style="font-size: 16px; font-weight: 700; color: var(--primary);">0건</div>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 11px; color: var(--danger); margin-bottom: 2px;">❌ 통장 누락</div>
+              <div id="recon-stat-unmatched" style="font-size: 16px; font-weight: 700; color: var(--danger);">0건</div>
+            </div>
+          </div>
+
+          <!-- Recon results list -->
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>상태</th>
+                  <th>영수증 입고일</th>
+                  <th>납품처</th>
+                  <th>영수증 금액</th>
+                  <th>매칭 통장일 (적요)</th>
+                  <th>통장 금액</th>
+                  <th>차액</th>
+                  <th>상세</th>
+                </tr>
+              </thead>
+              <tbody id="reconciliation-tbody">
+                <tr>
+                  <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">[대사 실행] 버튼을 눌러 분석을 시작하세요.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 4: SETTINGS & BACKUP (설정 및 관리) -->
+      <!-- ============================================== -->
+      <section id="settings-tab" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">설정 및 데이터 관리</h1>
+            <p class="section-desc">AI API 키 및 기준 데이터 관리, 데이터 백업을 수행합니다.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Gemini API Key configuration -->
+          <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="glass-card-header">
+                <div class="card-title">
+                  <i data-lucide="key" style="color: var(--primary);"></i>
+                  <span>Gemini API Key 설정</span>
+                </div>
+              </div>
+              <p class="section-desc" style="margin-bottom: 20px;">
+                무료 구글 AI를 활용한 영수증 판독 기능 작동을 위한 API 키를 입력하세요. <br>
+                API 키는 <a href="https://aistudio.google.com" target="_blank" style="color: var(--primary); font-weight:700;">AI Studio</a>에서 구글 로그인 후 발급받을 수 있습니다.
+              </p>
+
+              <div class="form-group">
+                <label for="gemini-key-input">Gemini API Key</label>
+                <div class="input-with-icon">
+                  <input type="password" id="gemini-key-input" placeholder="AI Studio에서 발급받은 API 키 입력">
+                  <button type="button" class="input-icon-btn" onclick="togglePasswordVisibility('gemini-key-input')" title="비밀번호 보기/숨기기">
+                    <i data-lucide="eye" id="gemini-key-eye"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="expiry-threshold">유통기한 위험 경고일 기준 (일)</label>
+                <input type="number" id="expiry-threshold" value="7" min="1" max="90" placeholder="기본 7일">
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+              <button class="btn btn-secondary" onclick="testApiKey()">
+                <i data-lucide="check-circle-2"></i>
+                <span>API 키 유효성 테스트</span>
+              </button>
+              <button class="btn btn-primary" style="flex: 1;" onclick="saveConfig()">
+                <i data-lucide="save"></i>
+                <span>설정 저장</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Data Backup and Restore -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="database" style="color: var(--accent);"></i>
+                <span>데이터 백업 및 복원</span>
+              </div>
+            </div>
+            <p class="section-desc" style="margin-bottom: 20px;">
+              브라우저가 초기화되거나 다른 기기에서 재고 데이터를 불러오기 위한 기능입니다. 주기적인 수동 백업을 권장합니다.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <button class="btn btn-secondary" style="justify-content: flex-start; text-align: left;" onclick="exportDataBackup()">
+                <i data-lucide="upload-cloud"></i>
+                <div>
+                  <div style="font-weight: 700; font-size:14px;">데이터 JSON 파일 내보내기 (백업)</div>
+                  <div style="font-weight: 400; font-size:12px; color: var(--text-muted);">전체 품목, 입고기록, 설정 저장</div>
+                </div>
+              </button>
+
+              <div class="upload-area" id="restore-dropzone" onclick="triggerFileInput('restore-file-input')" style="padding: 16px; border-style: solid; border-width: 1px;">
+                <div style="display:flex; align-items:center; gap:12px; width:100%; text-align:left;">
+                  <div class="upload-icon" style="width:36px; height:36px;"><i data-lucide="download-cloud" style="width:18px; height:18px;"></i></div>
+                  <div>
+                    <div style="font-weight: 700; font-size:14px;">데이터 백업 복원하기 (가져오기)</div>
+                    <div style="font-weight: 400; font-size:12px; color: var(--text-muted);">기존 데이터를 백업 JSON 파일로 덮어씌웁니다.</div>
+                  </div>
+                </div>
+                <input type="file" id="restore-file-input" accept=".json" style="display: none;" onchange="importDataBackup(this)">
+              </div>
+
+              <button class="btn btn-danger" style="margin-top: 12px;" onclick="resetDatabaseWithConfirm()">
+                <i data-lucide="trash-2"></i>
+                <span>전체 데이터 초기화</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Suppliers list management -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="truck" style="color: var(--success);"></i>
+                <span>납품처 관리</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <form id="add-supplier-form" onsubmit="handleAddSupplier(event)" style="display:flex; gap:8px;">
+                <input type="text" id="new-supplier-name" required placeholder="새 납품처 이름 입력" style="flex:1;">
+                <button type="submit" class="btn btn-accent btn-sm">추가</button>
+              </form>
+            </div>
+
+            <div class="table-container" style="max-height: 250px; overflow-y:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>납품처명</th>
+                    <th style="width: 80px; text-align:right;">액션</th>
+                  </tr>
+                </thead>
+                <tbody id="suppliers-list-tbody">
+                  <!-- Populate dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Categories list management -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <div class="card-title">
+                <i data-lucide="tags" style="color: var(--warning);"></i>
+                <span>카테고리 관리</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <form id="add-category-form" onsubmit="handleAddCategory(event)" style="display:flex; gap:8px;">
+                <input type="text" id="new-category-name" required placeholder="새 카테고리 이름" style="flex:1;">
+                <input type="color" id="new-category-color" value="#3b82f6" style="width:48px; padding:0; cursor:pointer;" title="카테고리 태그 색상">
+                <button type="submit" class="btn btn-accent btn-sm">추가</button>
+              </form>
+            </div>
+
+            <div class="table-container" style="max-height: 250px; overflow-y:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>카테고리명</th>
+                    <th>색상</th>
+                    <th style="width: 80px; text-align:right;">액션</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-list-tbody">
+                  <!-- Populate dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div> <!-- End App Wrapper -->
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav">
+    <a class="mobile-nav-item active" onclick="switchTab('stock-entry-tab', this)">
+      <i data-lucide="package-plus"></i>
+      <span>입고 등록</span>
+    </a>
+    <a class="mobile-nav-item" onclick="switchTab('inventory-tab', this)">
+      <i data-lucide="boxes"></i>
+      <span>입고 현황</span>
+    </a>
+    <a class="mobile-nav-item" onclick="switchTab('analytics-tab', this)">
+      <i data-lucide="line-chart"></i>
+      <span>통계</span>
+    </a>
+    <a class="mobile-nav-item" onclick="switchTab('finance-tab', this)">
+      <i data-lucide="wallet"></i>
+      <span>재무</span>
+    </a>
+    <a class="mobile-nav-item" onclick="switchTab('settings-tab', this)">
+      <i data-lucide="settings"></i>
+      <span>설정</span>
+    </a>
+  </nav>
+
+  <!-- ============================================== -->
+  <!-- MODAL: BARCODE SCANNER -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop" id="barcode-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">
+          <i data-lucide="scan"></i>
+          <span>카메라 바코드 스캐너</span>
+        </h3>
+        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBarcodeScanner()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          빨간색 스캔선 내에 바코드가 선명하게 들어오도록 조절해 주세요.
+        </p>
+        <div id="barcode-reader-container">
+          <div id="barcode-reader" style="width: 100%;"></div>
+        </div>
+        <div id="barcode-scan-result" style="margin-top: 16px; font-weight:700; font-size:16px; color:var(--primary);">
+          대기 중...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeBarcodeScanner()">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: EDIT BATCH (입고 정보 수정) -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop" id="edit-modal">
+    <div class="modal-content" style="max-width: 550px; width: 90%;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">
+          <i data-lucide="edit-3" style="color:var(--accent);"></i>
+          <span>입고 정보 수정</span>
+        </h3>
+        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeEditModal()"><i data-lucide="x"></i></button>
+      </div>
+      <form id="edit-batch-form" onsubmit="handleEditBatchSubmit(event)">
+        <div class="modal-body">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="edit-supplier">납품처</label>
+              <select id="edit-supplier" required></select>
+            </div>
+            <div class="form-group">
+              <label for="edit-category">카테고리</label>
+              <select id="edit-category" required></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-name">품목명</label>
+            <input type="text" id="edit-name" required placeholder="예: 메로나 바닐라맛">
+          </div>
+          <div class="form-group">
+            <label for="edit-barcode">바코드</label>
+            <div class="input-with-icon">
+              <input type="text" id="edit-barcode" placeholder="바코드를 스캔하거나 입력하세요">
+              <button type="button" class="input-icon-btn" onclick="openBarcodeScanner('edit-barcode')" title="바코드 스캔">
+                <i data-lucide="scan-line"></i>
+              </button>
+            </div>
+          </div>
+          <div class="grid-3">
+            <div class="form-group">
+              <label for="edit-qty">입고 수량 (개)</label>
+              <input type="number" id="edit-qty" required min="1" placeholder="예: 20">
+            </div>
+            <div class="form-group">
+              <label for="edit-purchase-price">매입 단가 (원)</label>
+              <input type="number" id="edit-purchase-price" required min="0" oninput="calculateProfitMargin('edit')" placeholder="예: 500">
+            </div>
+            <div class="form-group">
+              <label for="edit-selling-price">소비자가 (원)</label>
+              <input type="number" id="edit-selling-price" required min="0" oninput="calculateProfitMargin('edit')" placeholder="예: 1000">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="edit-expiry-date">유통기한</label>
+              <input type="date" id="edit-expiry-date" required>
+            </div>
+            <div class="form-group">
+              <label>수익률 / 마진</label>
+              <div id="edit-profit-display" style="padding: 10px 0; font-size: 16px; font-weight: 800; color: var(--success);">
+                0.0%
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-note">메모</label>
+            <textarea id="edit-note" rows="2" placeholder="간단한 메모 입력"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+          <button type="submit" class="btn btn-primary">수정사항 저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: BANK TRANSACTION EDITOR (통장 내역 확인 및 수정) -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop" id="bank-editor-modal">
+    <div class="modal-content" style="max-width: 800px; width: 95%;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">
+          <i data-lucide="edit-3" style="color:var(--primary);"></i>
+          <span id="bank-editor-title">통장 거래 내역 검토 및 수정</span>
+        </h3>
+        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBankEditorModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 13px; color: var(--text-muted);">
+            대상 월: <span id="bank-editor-month-label" style="font-weight: 700; color: var(--text);">2026-05</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addBankEditorRow()">
+            <i data-lucide="plus"></i>
+            <span>거래 추가</span>
+          </button>
+        </div>
+        <div class="table-wrapper" style="max-height: 400px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 15%;">날짜</th>
+                <th style="width: 15%;">구분</th>
+                <th style="width: 20%;">금액 (원)</th>
+                <th style="width: 30%;">적요 (설명)</th>
+                <th style="width: 15%;">분류</th>
+                <th style="width: 5%;">삭제</th>
+              </tr>
+            </thead>
+            <tbody id="bank-editor-tbody">
+              <!-- Dynamic Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeBankEditorModal()">취소</button>
+        <button type="button" class="btn btn-primary" onclick="saveBankEditorTransactions()">
+          <i data-lucide="check"></i>
+          <span>최종 저장</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: BANK TRANSACTION DETAILS (통장 내역 상세 조회) -->
+  <!-- ============================================== -->
+  <div class="modal-backdrop" id="bank-details-modal">
+    <div class="modal-content" style="max-width: 600px; width: 90%;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">
+          <i data-lucide="file-text" style="color:var(--accent);"></i>
+          <span id="bank-details-title">통장 거래 상세 내역</span>
+        </h3>
+        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBankDetailsModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-wrapper" style="max-height: 350px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <th>구분</th>
+                <th>금액</th>
+                <th>적요</th>
+                <th>분류</th>
+              </tr>
+            </thead>
+            <tbody id="bank-details-tbody">
+              <!-- Dynamic Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeBankDetailsModal()">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Wrapper Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JS APPLICATION LOGIC -->
+  <script>
+    // ==========================================
+    // STATE LAYER & LOCALSTORAGE MANAGEMENT
+    // ==========================================
+    let state = {
+      products: [],
+      stock_in: [],
+      inventory: [],
+      suppliers: [],
+      categories: [],
+      bank_records: [],
+      settings: {
+        gemini_api_key: '',
+        alert_threshold: 7
+      }
+    };
+
+    // Helper functions to generate random strings for UUIDs (since serverless)
+    function generateId(prefix = 'id') {
+      return `${prefix}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    // Load state from local storage or set defaults
+    function initAppDatabase() {
+      const storedProducts = localStorage.getItem('funny_products');
+      const storedStockIn = localStorage.getItem('funny_stock_in');
+      const storedInventory = localStorage.getItem('funny_inventory');
+      const storedSuppliers = localStorage.getItem('funny_suppliers');
+      const storedCategories = localStorage.getItem('funny_categories');
+      const storedSettings = localStorage.getItem('funny_settings');
+      const storedBankRecords = localStorage.getItem('funny_bank_records');
+
+      if (storedProducts && storedStockIn && storedInventory && storedSuppliers && storedCategories && storedSettings) {
+        state.products = JSON.parse(storedProducts);
+        state.stock_in = JSON.parse(storedStockIn);
+        state.inventory = JSON.parse(storedInventory);
+        state.suppliers = JSON.parse(storedSuppliers);
+        state.categories = JSON.parse(storedCategories);
+        state.settings = JSON.parse(storedSettings);
+        state.bank_records = storedBankRecords ? JSON.parse(storedBankRecords) : [];
+      } else {
+        // Load premium sample mock data for first impressions!
+        const todayStr = getTodayString();
+        const dMinus2 = getOffsetDateString(-2);
+        const dPlus2 = getOffsetDateString(2);
+        const dPlus5 = getOffsetDateString(5);
+        const dPlus15 = getOffsetDateString(15);
+        const dPlus40 = getOffsetDateString(40);
+        const dPlus365 = getOffsetDateString(365);
+
+        // Prepopulate suppliers
+        state.suppliers = [
+          { id: 'sup_001', name: '빙그레 아이스크림', category_types: ['icecream'] },
+          { id: 'sup_002', name: '해태/크라운 유통', category_types: ['snack', 'beverage'] },
+          { id: 'sup_003', name: '해피 토이 유통', category_types: ['toy'] }
+        ];
+
+        // Prepopulate categories
+        state.categories = [
+          { id: 'cat_001', name: '아이스크림', color: '#3b82f6' },
+          { id: 'cat_002', name: '과자', color: '#f59e0b' },
+          { id: 'cat_003', name: '음료', color: '#10b981' },
+          { id: 'cat_004', name: '장난감', color: '#8b5cf6' }
+        ];
+
+        // Prepopulate products
+        state.products = [
+          { id: 'prod_001', name: '메로나', category: '아이스크림', supplier_id: 'sup_001', selling_price: 1000, barcode: '8801062016629', is_favorite: true, note: '인기 판매 상품' },
+          { id: 'prod_002', name: '월드콘', category: '아이스크림', supplier_id: 'sup_001', selling_price: 1500, barcode: '8801062363150', is_favorite: true, note: '바닐라 맛 콘' },
+          { id: 'prod_003', name: '포카칩 오리지널', category: '과자', supplier_id: 'sup_002', selling_price: 1800, barcode: '8801117231458', is_favorite: false, note: '맥주 안주' },
+          { id: 'prod_004', name: '코카콜라 500ml', category: '음료', supplier_id: 'sup_002', selling_price: 1500, barcode: '8801094012507', is_favorite: true, note: '페트병' },
+          { id: 'prod_005', name: '미니 토이카', category: '장난감', supplier_id: 'sup_003', selling_price: 3000, barcode: '8809476510342', is_favorite: false, note: '남아 장난감 선호' }
+        ];
+
+        // Prepopulate stock ins
+        state.stock_in = [
+          { id: 'in_001', product_id: 'prod_001', quantity: 30, purchase_price: 500, expiry_date: dPlus5, date: getOffsetDateString(-5), photo_ref: '빙그레 전표 1' },
+          { id: 'in_002', product_id: 'prod_001', quantity: 20, purchase_price: 500, expiry_date: dPlus40, date: getOffsetDateString(-1), photo_ref: '빙그레 전표 2' },
+          { id: 'in_003', product_id: 'prod_002', quantity: 24, purchase_price: 800, expiry_date: dMinus2, date: getOffsetDateString(-10), photo_ref: '빙그레 전표 1' },
+          { id: 'in_004', product_id: 'prod_003', quantity: 15, purchase_price: 1000, expiry_date: dPlus2, date: getOffsetDateString(-2), photo_ref: '해태 전표' },
+          { id: 'in_005', product_id: 'prod_004', quantity: 40, purchase_price: 700, expiry_date: dPlus15, date: getOffsetDateString(-3), photo_ref: '코카콜라 전표' }
+        ];
+
+        // Prepopulate inventory
+        state.inventory = [
+          { product_id: 'prod_001', current_qty: 12, expiry_date: dPlus5, profit_rate: 100.0 },
+          { product_id: 'prod_001', current_qty: 20, expiry_date: dPlus40, profit_rate: 100.0 },
+          { product_id: 'prod_002', current_qty: 5, expiry_date: dMinus2, profit_rate: 87.5 },
+          { product_id: 'prod_003', current_qty: 8, expiry_date: dPlus2, profit_rate: 80.0 },
+          { product_id: 'prod_004', current_qty: 35, expiry_date: dPlus15, profit_rate: 114.3 },
+          { product_id: 'prod_005', current_qty: 3, expiry_date: dPlus365, profit_rate: 100.0 } // 3 left
+        ];
+
+        // Prepopulate bank records for financial charts & reconciliation testing
+        state.bank_records = [
+          {
+            id: 'bank_202601',
+            year: 2026,
+            month: 1,
+            transactions: [
+              { id: 'tx_101', date: '2026-01-05', type: 'income', amount: 850000, description: '1월 카드 정산 매출', category: 'sales' },
+              { id: 'tx_102', date: '2026-01-10', type: 'expense', amount: 450000, description: '도매 납품 일괄 결제', category: 'purchase' },
+              { id: 'tx_103', date: '2026-01-20', type: 'expense', amount: 180000, description: '월세 및 공공요금', category: 'rent' }
+            ],
+            total_income: 850000,
+            total_expense: 630000,
+            net_profit: 220000,
+            created_at: '2026-01-31'
+          },
+          {
+            id: 'bank_202602',
+            year: 2026,
+            month: 2,
+            transactions: [
+              { id: 'tx_201', date: '2026-02-05', type: 'income', amount: 920000, description: '2월 카드 정산 매출', category: 'sales' },
+              { id: 'tx_202', date: '2026-02-10', type: 'expense', amount: 500000, description: '도매 납품 일괄 결제', category: 'purchase' },
+              { id: 'tx_203', date: '2026-02-20', type: 'expense', amount: 210000, description: '월세 및 공과금', category: 'rent' }
+            ],
+            total_income: 920000,
+            total_expense: 710000,
+            net_profit: 210000,
+            created_at: '2026-02-28'
+          },
+          {
+            id: 'bank_202603',
+            year: 2026,
+            month: 3,
+            transactions: [
+              { id: 'tx_301', date: '2026-03-05', type: 'income', amount: 780000, description: '3월 카드 정산 매출', category: 'sales' },
+              { id: 'tx_302', date: '2026-03-10', type: 'expense', amount: 400000, description: '도매 납품 일괄 결제', category: 'purchase' },
+              { id: 'tx_303', date: '2026-03-20', type: 'expense', amount: 190000, description: '월세 및 공공요금', category: 'rent' }
+            ],
+            total_income: 780000,
+            total_expense: 590000,
+            net_profit: 190000,
+            created_at: '2026-03-31'
+          },
+          {
+            id: 'bank_202604',
+            year: 2026,
+            month: 4,
+            transactions: [
+              { id: 'tx_401', date: '2026-04-05', type: 'income', amount: 1050000, description: '4월 카드 정산 매출', category: 'sales' },
+              { id: 'tx_402', date: '2026-04-10', type: 'expense', amount: 600000, description: '도매 납품 일괄 결제', category: 'purchase' },
+              { id: 'tx_403', date: '2026-04-20', type: 'expense', amount: 220000, description: '월세 및 공공요금', category: 'rent' }
+            ],
+            total_income: 1050000,
+            total_expense: 820000,
+            net_profit: 230000,
+            created_at: '2026-04-30'
+          },
+          {
+            id: 'bank_202605',
+            year: 2026,
+            month: 5,
+            transactions: [
+              { id: 'tx_501', date: '2026-05-03', type: 'income', amount: 480000, description: '카드정산대금 입금', category: 'sales' },
+              { id: 'tx_502', date: '2026-05-10', type: 'expense', amount: 19200, description: '빙그레 아이스크림 납품 결제', category: 'purchase' },
+              { id: 'tx_503', date: '2026-05-12', type: 'income', amount: 150000, description: '현금 정산 입금', category: 'sales' },
+              { id: 'tx_504', date: '2026-05-15', type: 'expense', amount: 15000, description: '빙그레 대리점 출금', category: 'purchase' },
+              { id: 'tx_505', date: '2026-05-17', type: 'expense', amount: 200000, description: '아파트 상가 임대료', category: 'rent' },
+              { id: 'tx_506', date: '2026-05-18', type: 'expense', amount: 14000, description: '해태 크라운 납품', category: 'purchase' },
+              { id: 'tx_507', date: '2026-05-19', type: 'expense', amount: 10000, description: '빙그레 대리점 출금', category: 'purchase' },
+              { id: 'tx_508', date: '2026-05-20', type: 'expense', amount: 45000, description: '수도 전기 공과금', category: 'utilities' },
+              { id: 'tx_509', date: '2026-05-25', type: 'income', amount: 350000, description: '신한카드 매출 입금', category: 'sales' }
+            ],
+            total_income: 980000,
+            total_expense: 303200,
+            net_profit: 676800,
+            created_at: '2026-05-31'
+          }
+        ];
+
+        // Setup default settings
+        state.settings = {
+          gemini_api_key: '',
+          alert_threshold: 7
+        };
+
+        saveStateToLocalStorage();
+      }
+
+      // Populate elements in UI on load
+      populateFormDropdowns();
+      adaptCategoriesBySupplier();
+      renderInventory();
+      renderSuppliersList();
+      renderCategoriesList();
+      loadConfigToUI();
+      renderRecentStockIns();
+      renderFavoritesList();
+      updateDashboardAnalytics();
+    }
+
+    function saveStateToLocalStorage() {
+      localStorage.setItem('funny_products', JSON.stringify(state.products));
+      localStorage.setItem('funny_stock_in', JSON.stringify(state.stock_in));
+      localStorage.setItem('funny_inventory', JSON.stringify(state.inventory));
+      localStorage.setItem('funny_suppliers', JSON.stringify(state.suppliers));
+      localStorage.setItem('funny_categories', JSON.stringify(state.categories));
+      localStorage.setItem('funny_settings', JSON.stringify(state.settings));
+      localStorage.setItem('funny_bank_records', JSON.stringify(state.bank_records));
+    }
+
+    // Helper: format today's date YYYY-MM-DD
+    function getTodayString() {
+      const today = new Date();
+      return today.toISOString().split('T')[0];
+    }
+
+    // Helper: offset date by days
+    function getOffsetDateString(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0];
+    }
+
+    // ==========================================
+    // TOAST NOTIFICATIONS
+    // ==========================================
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      let icon = 'info';
+      if (type === 'success') icon = 'check-circle-2';
+      if (type === 'danger') icon = 'alert-triangle';
+      if (type === 'warning') icon = 'alert-circle';
+
+      toast.innerHTML = `
+        <i data-lucide="${icon}"></i>
+        <div>${message}</div>
+      `;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      // Trigger reflow to run transition
+      setTimeout(() => toast.classList.add('show'), 50);
+
+      // Remove toast after 3s
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ==========================================
+    // THEME SWITCHER (DARK / LIGHT)
+    // ==========================================
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('theme');
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      htmlEl.setAttribute('theme', nextTheme);
+      localStorage.setItem('funny_theme', nextTheme);
+      
+      updateThemeIcons(nextTheme);
+      showToast(`${nextTheme === 'dark' ? '다크' : '라이트'} 모드로 전환되었습니다.`);
+      
+      // Redraw charts since text colors need to match theme
+      if (charts.popular) updateCharts();
+    }
+
+    function updateThemeIcons(theme) {
+      const sidebarIcon = document.getElementById('sidebar-theme-icon');
+      const mobileIcon = document.getElementById('mobile-theme-icon');
+      const iconName = theme === 'dark' ? 'sun' : 'moon';
+      
+      sidebarIcon.setAttribute('data-lucide', iconName);
+      mobileIcon.setAttribute('data-lucide', iconName);
+      lucide.createIcons();
+    }
+
+    function initDragAndDrop() {
+      const dropzones = [
+        { id: 'receipt-dropzone', type: 'receipt', inputId: 'receipt-input' },
+        { id: 'label-dropzone', type: 'label', inputId: 'label-input' },
+        { id: 'bank-dropzone', type: 'bank', inputId: 'bank-input' }
+      ];
+
+      dropzones.forEach(({ id, type, inputId }) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        // Prevent default browser behaviors for drag & drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          el.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }, false);
+        });
+
+        // Add highlight class on dragover/dragenter
+        ['dragenter', 'dragover'].forEach(eventName => {
+          el.addEventListener(eventName, () => {
+            el.classList.add('dragover');
+          }, false);
+        });
+
+        // Remove highlight on dragleave/drop
+        ['dragleave', 'drop'].forEach(eventName => {
+          el.addEventListener(eventName, () => {
+            el.classList.remove('dragover');
+          }, false);
+        });
+
+        // Handle dropped files
+        el.addEventListener('drop', (e) => {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files && files.length > 0) {
+            const fileInput = document.getElementById(inputId);
+            if (fileInput) {
+              fileInput.files = files;
+            }
+            handleFileSelected(files[0], type);
+          }
+        }, false);
+      });
+    }
+
+    // Set initial theme on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const storedTheme = localStorage.getItem('funny_theme') || 'dark';
+      document.documentElement.setAttribute('theme', storedTheme);
+      updateThemeIcons(storedTheme);
+      
+      initAppDatabase();
+      initDragAndDrop();
+      document.getElementById('stock-expiry-date').value = getTodayString();
+      lucide.createIcons();
+    });
+
+    // ==========================================
+    // TAB ROUTING SYSTEM
+    // ==========================================
+    function switchTab(tabId, el) {
+      // Hide all page sections
+      document.querySelectorAll('.page-section').forEach(sec => {
+        sec.classList.remove('active');
+      });
+
+      // Show the selected one
+      const targetSec = document.getElementById(tabId);
+      if (targetSec) {
+        targetSec.classList.add('active');
+      }
+
+      // Update nav menu active states
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.querySelectorAll('.mobile-nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // Find indices or match elements
+      el.classList.add('active');
+      
+      // Match active in the other menu (desktop vs mobile sync)
+      const tabName = tabId.replace('-tab', '');
+      document.querySelectorAll(`.nav-item, .mobile-nav-item`).forEach(item => {
+        const onclickAttr = item.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(tabId)) {
+          item.classList.add('active');
+        }
+      });
+
+      // If switching to statistics tab, render charts
+      if (tabId === 'analytics-tab') {
+        updateDashboardAnalytics();
+      }
+
+      // If switching to inventory status tab, re-render
+      if (tabId === 'inventory-tab') {
+        renderInventory();
+      }
+
+      // If switching to finance tab, re-render and init charts
+      if (tabId === 'finance-tab') {
+        renderFinanceTab();
+      }
+
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // MOCK / DYNAMIC DROPDOWNS POPULATION
+    // ==========================================
+    function populateFormDropdowns() {
+      // Stock Entry Suppliers
+      const supplierSelect = document.getElementById('stock-supplier');
+      const filterSupplier = document.getElementById('filter-supplier');
+      
+      supplierSelect.innerHTML = '';
+      filterSupplier.innerHTML = '<option value="all">전체 납품처</option>';
+
+      state.suppliers.forEach(sup => {
+        const option = document.createElement('option');
+        option.value = sup.id;
+        option.textContent = sup.name;
+        supplierSelect.appendChild(option);
+
+        const filterOpt = document.createElement('option');
+        filterOpt.value = sup.id;
+        filterOpt.textContent = sup.name;
+        filterSupplier.appendChild(filterOpt);
+      });
+
+      // AI Default Category dropdown
+      const aiDefaultCatSelect = document.getElementById('ai-default-category');
+      if (aiDefaultCatSelect) {
+        const savedVal = aiDefaultCatSelect.value;
+        aiDefaultCatSelect.innerHTML = '<option value="">(자동 분류 또는 선택 안 함)</option>';
+        state.categories.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat.name;
+          option.textContent = cat.name;
+          aiDefaultCatSelect.appendChild(option);
+        });
+        if (savedVal && state.categories.some(c => c.name === savedVal)) {
+          aiDefaultCatSelect.value = savedVal;
+        }
+      }
+    }
+
+    function adaptCategoriesBySupplier() {
+      const supId = document.getElementById('stock-supplier').value;
+      const categorySelect = document.getElementById('stock-category');
+      categorySelect.innerHTML = '';
+
+      const supplier = state.suppliers.find(s => s.id === supId);
+      if (!supplier) return;
+
+      // Filter categories to show
+      state.categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.name;
+        option.textContent = cat.name;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    // Calculate profit margin for manual entry & edit modal
+    function calculateProfitMargin(prefix) {
+      let cost, price, display;
+      if (prefix === 'manual') {
+        cost = parseFloat(document.getElementById('stock-purchase-price').value) || 0;
+        price = parseFloat(document.getElementById('stock-selling-price').value) || 0;
+        display = document.getElementById('manual-profit-display');
+      } else if (prefix === 'edit') {
+        cost = parseFloat(document.getElementById('edit-purchase-price').value) || 0;
+        price = parseFloat(document.getElementById('edit-selling-price').value) || 0;
+        display = document.getElementById('edit-profit-display');
+      }
+
+      if (!display) return 0;
+
+      if (cost <= 0) {
+        const rate = price > 0 ? 100 : 0;
+        display.textContent = `${rate.toFixed(1)}%`;
+        display.style.color = rate > 0 ? 'var(--success)' : 'var(--text-muted)';
+        return rate;
+      }
+
+      const rate = ((price - cost) / cost) * 100;
+      display.textContent = `${rate.toFixed(1)}%`;
+      
+      if (rate >= 60) {
+        display.style.color = 'var(--success)';
+      } else if (rate >= 20) {
+        display.style.color = 'var(--primary)';
+      } else {
+        display.style.color = 'var(--danger)';
+      }
+
+      return rate;
+    }
+
+    // ==========================================
+    // BARCODE SCANNING (HTML5-QRCODE INTEGRATION)
+    // ==========================================
+    let html5QrcodeScanner = null;
+    let barcodeTargetInputId = '';
+
+    function openBarcodeScanner(targetInputId) {
+      barcodeTargetInputId = targetInputId;
+      document.getElementById('barcode-modal').classList.add('show');
+      document.getElementById('barcode-scan-result').textContent = '스캔 대기 중...';
+
+      // Start HTML5 Qrcode
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+      }
+
+      html5QrcodeScanner = new Html5Qrcode("barcode-reader");
+      
+      const config = { fps: 10, qrbox: { width: 250, height: 120 } };
+
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        config,
+        onBarcodeScanSuccess,
+        onBarcodeScanFailure
+      ).catch(err => {
+        showToast('카메라 접근 권한이 없거나 지원되지 않습니다.', 'danger');
+        closeBarcodeScanner();
+      });
+    }
+
+    function closeBarcodeScanner() {
+      document.getElementById('barcode-modal').classList.remove('show');
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          html5QrcodeScanner.clear();
+          html5QrcodeScanner = null;
+        }).catch(err => {
+          console.error("스캐너 정지 중 오류:", err);
+          html5QrcodeScanner = null;
+        });
+      }
+    }
+
+    function onBarcodeScanSuccess(decodedText, decodedResult) {
+      document.getElementById('barcode-scan-result').textContent = `스캔 완료: ${decodedText}`;
+      showToast(`바코드가 인식되었습니다: ${decodedText}`);
+
+      // Put the text in the input
+      const inputEl = document.getElementById(barcodeTargetInputId);
+      if (inputEl) {
+        inputEl.value = decodedText;
+        
+        // Trigger barcode product lookup if it is the Stock entry form
+        if (barcodeTargetInputId === 'stock-barcode') {
+          lookupProductByBarcode(decodedText);
+        } else if (barcodeTargetInputId === 'search-input') {
+          // Immediately trigger search
+          renderInventory();
+        }
+      }
+
+      setTimeout(() => {
+        closeBarcodeScanner();
+      }, 500);
+    }
+
+    function onBarcodeScanFailure(error) {
+      // Verbose console spam filter
+      // console.warn(`바코드 스캔 에러 = ${error}`);
+    }
+
+    // Auto fill product form if barcode is already registered
+    function lookupProductByBarcode(barcode) {
+      const product = state.products.find(p => p.barcode === barcode);
+      if (product) {
+        showToast(`기존 상품 [${product.name}] 정보가 적용되었습니다.`, 'success');
+        document.getElementById('stock-name').value = product.name;
+        document.getElementById('stock-category').value = product.category;
+        document.getElementById('stock-supplier').value = product.supplier_id;
+        document.getElementById('stock-selling-price').value = product.selling_price;
+        document.getElementById('stock-note').value = product.note || '';
+        calculateProfitMargin('manual');
+      } else {
+        showToast('새 바코드입니다. 품목을 입력하면 바코드가 함께 저장됩니다.', 'warning');
+      }
+    }
+
+    // ==========================================
+    // MANUAL FORM SUBMISSION
+    // ==========================================
+    function handleManualStockSubmit(event) {
+      event.preventDefault();
+      
+      const supplierId = document.getElementById('stock-supplier').value;
+      const category = document.getElementById('stock-category').value;
+      const barcode = document.getElementById('stock-barcode').value.trim();
+      const name = document.getElementById('stock-name').value.trim();
+      const qty = parseInt(document.getElementById('stock-qty').value) || 0;
+      const purchasePrice = parseFloat(document.getElementById('stock-purchase-price').value) || 0;
+      const sellingPrice = parseFloat(document.getElementById('stock-selling-price').value) || 0;
+      const expiryDate = document.getElementById('stock-expiry-date').value;
+      const note = document.getElementById('stock-note').value.trim();
+
+      if (!name || qty <= 0 || !expiryDate) {
+        showToast('필수 필드를 입력해 주세요.', 'danger');
+        return;
+      }
+
+      // Check if product with this name exists, otherwise create
+      let product = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+      
+      if (!product) {
+        product = {
+          id: generateId('prod'),
+          name,
+          category,
+          supplier_id: supplierId,
+          selling_price: sellingPrice,
+          barcode,
+          is_favorite: false,
+          note
+        };
+        state.products.push(product);
+      } else {
+        // Update details if product exists
+        product.category = category;
+        product.supplier_id = supplierId;
+        product.selling_price = sellingPrice;
+        if (barcode) product.barcode = barcode;
+        if (note) product.note = note;
+      }
+
+      // Create stock-in record
+      const stockInRec = {
+        id: generateId('in'),
+        product_id: product.id,
+        quantity: qty,
+        purchase_price: purchasePrice,
+        expiry_date: expiryDate,
+        date: getTodayString(),
+        photo_ref: '직접 입력'
+      };
+      state.stock_in.push(stockInRec);
+
+      // Update or Add to current inventory
+      const profitRate = purchasePrice > 0 ? parseFloat(((sellingPrice - purchasePrice) / purchasePrice * 100).toFixed(1)) : (sellingPrice > 0 ? 100 : 0);
+      
+      let invItem = state.inventory.find(inv => inv.product_id === product.id && inv.expiry_date === expiryDate);
+      if (invItem) {
+        invItem.current_qty += qty;
+        invItem.profit_rate = profitRate; // update with latest margin
+      } else {
+        state.inventory.push({
+          product_id: product.id,
+          current_qty: qty,
+          expiry_date: expiryDate,
+          profit_rate: profitRate
+        });
+      }
+
+      saveStateToLocalStorage();
+      showToast(`품목 [${name}] 재고 ${qty}개가 저장되었습니다.`, 'success');
+      
+      // UI resets and updates
+      resetManualForm();
+      renderRecentStockIns();
+      renderFavoritesList();
+      updateDashboardAnalytics();
+    }
+
+    function resetManualForm() {
+      document.getElementById('stock-name').value = '';
+      document.getElementById('stock-barcode').value = '';
+      document.getElementById('stock-qty').value = '10';
+      document.getElementById('stock-purchase-price').value = '500';
+      document.getElementById('stock-selling-price').value = '1000';
+      document.getElementById('stock-expiry-date').value = getTodayString();
+      document.getElementById('stock-note').value = '';
+      calculateProfitMargin('manual');
+    }
+
+    // Render 5 recent stock ins
+    function renderRecentStockIns() {
+      const tbody = document.getElementById('recent-stockins-tbody');
+      tbody.innerHTML = '';
+
+      // Sort by date or ID desc (latest first)
+      const sortedIn = [...state.stock_in].sort((a,b) => b.id.localeCompare(a.id)).slice(0, 5);
+
+      if (sortedIn.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">최근 입고 내역이 없습니다.</td></tr>`;
+        return;
+      }
+
+      sortedIn.forEach(rec => {
+        const prod = state.products.find(p => p.id === rec.product_id) || { name: '알 수 없는 상품', category: '기타' };
+        const supplier = state.suppliers.find(s => s.id === (prod.supplier_id || '')) || { name: '일반 납품처' };
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${rec.date}</td>
+          <td style="font-weight:700;">${prod.name}</td>
+          <td><span class="badge" style="background-color: var(--accent-muted); color: var(--accent);">${prod.category}</span></td>
+          <td>${rec.quantity}개</td>
+          <td>₩${rec.purchase_price.toLocaleString()}</td>
+          <td>${rec.expiry_date}</td>
+          <td style="color:var(--text-muted);">${supplier.name}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ==========================================
+    // GEMINI 2.5 FLASH AI IMAGE OCR INTEGRATION
+    // ==========================================
+    let loadedFiles = {
+      receipt: null,
+      label: null,
+      bank: null
+    };
+
+    function triggerFileInput(inputId) {
+      document.getElementById(inputId).click();
+    }
+
+    function handleFileSelected(input, type) {
+      // Allow passing a File object directly (for drag-and-drop) or an input element
+      const file = input instanceof File ? input : (input.files ? input.files[0] : null);
+      if (!file) return;
+
+      // Type checking
+      if (type === 'receipt' && !['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(file.type)) {
+        showToast('영수증은 이미지(JPG, PNG, WEBP) 또는 PDF 파일만 업로드할 수 있습니다.', 'warning');
+        return;
+      }
+      if (type === 'label' && !file.type.startsWith('image/')) {
+        showToast('유통기한 라벨은 이미지 파일만 업로드할 수 있습니다.', 'warning');
+        return;
+      }
+      if (type === 'bank' && !['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(file.type)) {
+        showToast('통장 내역은 이미지 또는 PDF 파일만 업로드할 수 있습니다.', 'warning');
+        return;
+      }
+
+      loadedFiles[type] = file;
+
+      const preview = document.getElementById(`${type}-preview`);
+      const dropzone = document.getElementById(`${type}-dropzone`);
+      
+      const isPdf = file.type === 'application/pdf';
+      const icon = dropzone.querySelector('.upload-icon');
+      const text2 = dropzone.querySelector('div:nth-of-type(2)');
+      const text3 = dropzone.querySelector('div:nth-of-type(3)');
+
+      if (isPdf) {
+        if (preview) {
+          preview.src = '';
+          preview.style.display = 'none';
+        }
+        icon.style.display = 'none';
+        
+        // Show PDF tag and filename
+        text2.innerHTML = `<i data-lucide="file-text" style="display:inline-block; width:16px; height:16px; color:#ef4444; vertical-align:middle; margin-right:4px;"></i><span style="font-weight:700; color:#ef4444;">PDF</span> ${file.name}`;
+        text2.style.color = 'var(--text)';
+        text2.style.display = 'block';
+        
+        text3.innerHTML = '클릭 또는 드롭하여 파일 변경';
+        text3.style.display = 'block';
+        
+        lucide.createIcons();
+
+        let typeLabel = '';
+        if (type === 'receipt') typeLabel = '영수증';
+        else if (type === 'label') typeLabel = '유통기한 라벨';
+        else if (type === 'bank') typeLabel = '통장 내역';
+        showToast(`${typeLabel} PDF 파일 등록 완료.`);
+      } else {
+        // It's an image
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (preview) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+          }
+          icon.style.display = 'none';
+          
+          text2.innerHTML = file.name;
+          text2.style.color = 'transparent';
+          text2.style.display = 'none';
+          
+          text3.style.display = 'none';
+          
+          let typeLabel = '';
+          if (type === 'receipt') typeLabel = '영수증';
+          else if (type === 'label') typeLabel = '유통기한 라벨';
+          else if (type === 'bank') typeLabel = '통장 내역';
+          showToast(`${typeLabel} 이미지 등록 완료.`);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function runAiAnalysis() {
+      const apiKey = state.settings.gemini_api_key;
+      if (!apiKey) {
+        showToast('설정 탭에서 Gemini API Key를 먼저 저장해 주세요!', 'danger');
+        switchTab('settings-tab', document.querySelector('.nav-item:nth-child(4)'));
+        return;
+      }
+
+      if (!loadedFiles.receipt && !loadedFiles.label) {
+        showToast('분석할 이미지(영수증 또는 라벨)를 업로드해 주세요.', 'warning');
+        return;
+      }
+
+      const loader = document.getElementById('ai-loading');
+      loader.style.display = 'flex';
+
+      try {
+        let base64Image = "";
+        let mimeType = "";
+        let activeFile = loadedFiles.receipt ? loadedFiles.receipt : loadedFiles.label;
+
+        // Convert file to base64
+        const fileReader = new FileReader();
+        
+        const fileAsBase64 = await new Promise((resolve, reject) => {
+          fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
+          fileReader.onerror = (e) => reject(e);
+          fileReader.readAsDataURL(activeFile);
+        });
+
+        mimeType = activeFile.type;
+
+        // Formulate Gemini Request
+        const promptText = `
+당신은 아이스크림 및 스낵 전문 매장 '퍼니스낵'의 재고 관리 점원입니다.
+제공된 이미지를 분석하여 상품 정보(상품명, 수량, 매입단가, 유통기한)를 추출해 주세요.
+이미지는 영수증이거나 상품의 유통기한 라벨일 수 있습니다.
+
+규칙:
+1. 영수증 이미지인 경우:
+   - 각 품목의 이름, 수량, 매입 단가(또는 단가)를 추출합니다.
+   - 영수증에는 유통기한이 적혀있지 않은 경우가 많으므로, 알 수 없는 경우 expiry_date는 null로 설정합니다.
+2. 유통기한 라벨 이미지인 경우:
+   - 상품명과 날짜(유통기한)를 추출합니다.
+   - 수량은 1로 설정하고, 매입단가는 판독이 안 되는 경우 null 또는 0으로 설정합니다.
+3. 날짜 형식은 반드시 'YYYY-MM-DD' 형식이어야 합니다. (예: '2026.08.15까지' -> '2026-08-15', '26.05.20' -> '2026-05-20')
+4. 상품명은 최대한 알아보기 쉬운 한국어 정식 명칭이나 통용 명칭으로 변환해 주세요 (예: '메로나', '코카콜라 500ml').
+5. 반드시 제공된 JSON 스키마 형식으로만 응답해야 하며, 어떠한 설명이나 Markdown 포맷(예: \`\`\`json ... \`\`\`)도 포함하지 마십시오.
+
+JSON 응답 형식:
+{
+  "items": [
+    {
+      "name": "상품명 (문자열)",
+      "quantity": 수량 (숫자, 판독 불가시 1),
+      "purchase_price": 매입단가 (숫자, 판독 불가시 0),
+      "expiry_date": "YYYY-MM-DD" (문자열 또는 null)
+    }
+  ]
+}
+        `;
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { inline_data: { mime_type: mimeType, data: fileAsBase64 } },
+                { text: promptText }
+              ]
+            }],
+            generationConfig: {
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API 오류: ${response.status}`);
+        }
+
+        const data = await response.json();
+        let jsonStr = data.candidates[0].content.parts[0].text;
+        
+        // Clean markdown backticks if returned in text fallback
+        jsonStr = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
+        const result = JSON.parse(jsonStr);
+
+        if (result && result.items && result.items.length > 0) {
+          showToast(`AI 분석 완료! ${result.items.length}개의 항목을 판독했습니다.`, 'success');
+          showVerificationCard(result.items);
+        } else {
+          showToast('품목을 판독하지 못했습니다. 수동 입력을 진행해 주세요.', 'warning');
+        }
+
+      } catch (err) {
+        console.error(err);
+        showToast(`AI 분석 실패: ${err.message}`, 'danger');
+      } finally {
+        loader.style.display = 'none';
+      }
+    }
+
+    let aiExtractedBuffer = []; // Temp storage for verification
+
+    function showVerificationCard(items) {
+      const card = document.getElementById('ai-verification-card');
+      const tbody = document.getElementById('ai-verification-tbody');
+      tbody.innerHTML = '';
+      aiExtractedBuffer = [];
+
+      items.forEach((item, index) => {
+        // Pre-fill values
+        const name = item.name || '';
+        const qty = item.quantity || 1;
+        const purchase = item.purchase_price || 500;
+        
+        // Look up if product already exists to guess category & selling price & supplier
+        const existingProd = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+        const defaultCatSelect = document.getElementById('ai-default-category');
+        const defaultCatVal = defaultCatSelect ? defaultCatSelect.value : '';
+        const category = defaultCatVal || (existingProd ? existingProd.category : (state.categories[0]?.name || ''));
+        const supplierId = existingProd ? existingProd.supplier_id : (state.suppliers[0]?.id || '');
+        const selling = existingProd ? existingProd.selling_price : (purchase * 1.5);
+        const expiry = item.expiry_date || getTodayString();
+
+        const bufferItem = {
+          tempId: index,
+          name,
+          category,
+          supplier_id: supplierId,
+          quantity: qty,
+          purchase_price: purchase,
+          selling_price: selling,
+          expiry_date: expiry,
+          barcode: existingProd ? existingProd.barcode : ''
+        };
+        aiExtractedBuffer.push(bufferItem);
+
+        // Render HTML row
+        const tr = document.createElement('tr');
+        tr.id = `verification-row-${index}`;
+        
+        // Create supplier options
+        let supplierOptions = '';
+        state.suppliers.forEach(s => {
+          supplierOptions += `<option value="${s.id}" ${s.id === supplierId ? 'selected' : ''}>${s.name}</option>`;
+        });
+
+        // Create category options
+        let categoryOptions = '';
+        state.categories.forEach(c => {
+          categoryOptions += `<option value="${c.name}" ${c.name === category ? 'selected' : ''}>${c.name}</option>`;
+        });
+
+        const profitRate = ((selling - purchase) / selling * 100).toFixed(1);
+
+        tr.innerHTML = `
+          <td>
+            <select onchange="updateBuffer(${index}, 'supplier_id', this.value)">
+              ${supplierOptions}
+            </select>
+          </td>
+          <td>
+            <select onchange="updateBuffer(${index}, 'category', this.value)">
+              ${categoryOptions}
+            </select>
+          </td>
+          <td>
+            <input type="text" value="${name}" oninput="updateBuffer(${index}, 'name', this.value)">
+          </td>
+          <td>
+            <input type="number" min="1" value="${qty}" oninput="updateBuffer(${index}, 'quantity', parseInt(this.value) || 0)">
+          </td>
+          <td>
+            <input type="number" min="0" value="${purchase}" oninput="updateBuffer(${index}, 'purchase_price', parseFloat(this.value) || 0); recalcRowProfit(${index})">
+          </td>
+          <td>
+            <input type="number" min="0" value="${selling}" oninput="updateBuffer(${index}, 'selling_price', parseFloat(this.value) || 0); recalcRowProfit(${index})">
+          </td>
+          <td>
+            <input type="date" value="${expiry}" oninput="updateBuffer(${index}, 'expiry_date', this.value)">
+          </td>
+          <td id="row-profit-${index}" style="font-weight:700; color:var(--success);">${profitRate}%</td>
+          <td>
+            <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteBufferItem(${index})" title="제외">
+              <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      card.style.display = 'block';
+      card.scrollIntoView({ behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function updateBuffer(index, field, value) {
+      const item = aiExtractedBuffer.find(i => i.tempId === index);
+      if (item) {
+        item[field] = value;
+      }
+    }
+
+    function recalcRowProfit(index) {
+      const item = aiExtractedBuffer.find(i => i.tempId === index);
+      if (!item) return;
+
+      const td = document.getElementById(`row-profit-${index}`);
+      if (item.selling_price <= 0) {
+        td.textContent = '0.0%';
+        td.style.color = 'var(--text-muted)';
+        return;
+      }
+
+      const rate = ((item.selling_price - item.purchase_price) / item.selling_price) * 100;
+      td.textContent = `${rate.toFixed(1)}%`;
+      td.style.color = rate >= 30 ? 'var(--success)' : (rate >= 10 ? 'var(--primary)' : 'var(--danger)');
+    }
+
+    function deleteBufferItem(index) {
+      aiExtractedBuffer = aiExtractedBuffer.filter(i => i.tempId !== index);
+      document.getElementById(`verification-row-${index}`).remove();
+      if (aiExtractedBuffer.length === 0) {
+        closeVerificationCard();
+      }
+    }
+
+    function closeVerificationCard() {
+      document.getElementById('ai-verification-card').style.display = 'none';
+      aiExtractedBuffer = [];
+      resetReceiptDropzones();
+    }
+
+    function saveAllVerifiedItems() {
+      if (aiExtractedBuffer.length === 0) return;
+
+      aiExtractedBuffer.forEach(item => {
+        // 1. Product mapping
+        let product = state.products.find(p => p.name.toLowerCase() === item.name.toLowerCase());
+        if (!product) {
+          product = {
+            id: generateId('prod'),
+            name: item.name,
+            category: item.category,
+            supplier_id: item.supplier_id,
+            selling_price: item.selling_price,
+            barcode: item.barcode || '',
+            is_favorite: false,
+            note: 'AI 자동 입고 등록'
+          };
+          state.products.push(product);
+        } else {
+          // Update product mapping properties
+          product.category = item.category;
+          product.supplier_id = item.supplier_id;
+          product.selling_price = item.selling_price;
+        }
+
+        // 2. Add stock-in
+        const stockIn = {
+          id: generateId('in'),
+          product_id: product.id,
+          quantity: item.quantity,
+          purchase_price: item.purchase_price,
+          expiry_date: item.expiry_date,
+          date: getTodayString(),
+          photo_ref: 'AI 영수증 분석'
+        };
+        state.stock_in.push(stockIn);
+
+        // 3. Add to inventory
+        const profitRate = item.purchase_price > 0 ? parseFloat(((item.selling_price - item.purchase_price) / item.purchase_price * 100).toFixed(1)) : (item.selling_price > 0 ? 100 : 0);
+        let invItem = state.inventory.find(inv => inv.product_id === product.id && inv.expiry_date === item.expiry_date);
+        
+        if (invItem) {
+          invItem.current_qty += item.quantity;
+          invItem.profit_rate = profitRate;
+        } else {
+          state.inventory.push({
+            product_id: product.id,
+            current_qty: item.quantity,
+            expiry_date: item.expiry_date,
+            profit_rate: profitRate
+          });
+        }
+      });
+
+      saveStateToLocalStorage();
+      showToast(`총 ${aiExtractedBuffer.length}개 품목이 재고에 추가되었습니다.`, 'success');
+      
+      closeVerificationCard();
+      renderRecentStockIns();
+      renderFavoritesList();
+      updateDashboardAnalytics();
+      renderInventory();
+    }
+
+    // ==========================================
+    // TAB 2: INVENTORY RENDERING (FILTERS + QUICK ACTIONS)
+    // ==========================================
+    let activeCategoryFilter = 'all';
+
+    // Simple Korean Consonant Matcher
+    function getChoSung(str) {
+      const cho = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+      let result = "";
+      for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i) - 44032;
+        if (code > -1 && code < 11172) {
+          result += cho[Math.floor(code / 588)];
+        } else {
+          result += str.charAt(i);
+        }
+      }
+      return result;
+    }
+
+    function renderInventory() {
+      // Load filters
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const supplierFilter = document.getElementById('filter-supplier').value;
+      const sortVal = document.getElementById('sort-select').value;
+      
+      const grid = document.getElementById('inventory-grid-container');
+      grid.innerHTML = '';
+
+      // Populate Category chips first
+      renderCategoryChips();
+
+      // Check D-days
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const warnDays = state.settings.alert_threshold || 7;
+
+      let filteredInv = state.inventory.map(inv => {
+        const prod = state.products.find(p => p.id === inv.product_id);
+        const supplier = state.suppliers.find(s => s.id === (prod?.supplier_id || ''));
+        
+        // Calculate D-day
+        const expiry = new Date(inv.expiry_date);
+        const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+        
+        return {
+          ...inv,
+          prodName: prod ? prod.name : '알 수 없는 상품',
+          prodBarcode: prod ? prod.barcode : '',
+          prodCategory: prod ? prod.category : '기타',
+          prodIsFavorite: prod ? prod.is_favorite : false,
+          prodSellingPrice: prod ? prod.selling_price : 0,
+          supplierName: supplier ? supplier.name : '기타 납품처',
+          supplierId: prod ? prod.supplier_id : '',
+          dday: diff
+        };
+      });
+
+      // Filter 1: Search (Name, Consonants, Barcode)
+      if (query) {
+        const isChosungOnly = /^[ㄱ-ㅎ]+$/.test(query);
+        filteredInv = filteredInv.filter(item => {
+          if (isChosungOnly) {
+            const chosung = getChoSung(item.prodName).toLowerCase();
+            return chosung.includes(query);
+          } else {
+            return item.prodName.toLowerCase().includes(query) || item.prodBarcode.includes(query);
+          }
+        });
+      }
+
+      // Filter 2: Category
+      if (activeCategoryFilter !== 'all') {
+        filteredInv = filteredInv.filter(item => item.prodCategory === activeCategoryFilter);
+      }
+
+      // Filter 3: Supplier
+      if (supplierFilter !== 'all') {
+        filteredInv = filteredInv.filter(item => item.supplierId === supplierFilter);
+      }
+
+      // Filter 4: Storage State (보관 상태)
+      const statusFilter = document.getElementById('filter-status').value;
+      if (statusFilter === 'active') {
+        filteredInv = filteredInv.filter(item => item.current_qty > 0 && (item.status === 'active' || !item.status));
+      } else if (statusFilter === 'archived') {
+        filteredInv = filteredInv.filter(item => item.current_qty === 0 || item.status === 'sold_out' || item.status === 'discarded');
+      } // 'all' shows all items
+
+      // Sorting
+      filteredInv.sort((a, b) => {
+        if (sortVal === 'expiry_asc') return a.dday - b.dday;
+        if (sortVal === 'expiry_desc') return b.dday - a.dday;
+        if (sortVal === 'qty_asc') return a.current_qty - b.current_qty;
+        if (sortVal === 'qty_desc') return b.current_qty - a.current_qty;
+        if (sortVal === 'profit_desc') return b.profit_rate - a.profit_rate;
+        if (sortVal === 'name_asc') return a.prodName.localeCompare(b.prodName);
+        return 0;
+      });
+
+      if (filteredInv.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align:center; padding:60px 20px; color:var(--text-muted);">
+            <i data-lucide="info" style="width:48px; height:48px; margin-bottom:12px; color:var(--primary);"></i>
+            <div style="font-weight:700; font-size:16px;">조건에 일치하는 입고 내역이 없습니다.</div>
+            <div style="font-size:13px; margin-top:4px;">입고를 추가하거나 필터를 조정해 보세요.</div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      // Render Cards
+      filteredInv.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'inventory-card';
+        
+        // Define badge color by D-day or Status
+        let badgeClass = 'badge-success';
+        let badgeText = `D-${item.dday}`;
+        
+        const isArchived = item.current_qty === 0 || item.status === 'sold_out' || item.status === 'discarded';
+        
+        if (item.status === 'sold_out') {
+          badgeClass = 'badge-success';
+          badgeText = '소진 완료';
+        } else if (item.status === 'discarded') {
+          badgeClass = 'badge-danger';
+          badgeText = '폐기 완료';
+        } else {
+          // Active state
+          if (item.dday <= 0) {
+            badgeClass = 'badge-danger';
+            badgeText = item.dday === 0 ? 'D-Day' : `만료 (D${item.dday})`;
+          } else if (item.dday <= 3) {
+            badgeClass = 'badge-warning'; // Orange
+          } else if (item.dday <= warnDays) {
+            badgeClass = 'badge-alert'; // Yellow
+          }
+        }
+
+        const cat = state.categories.find(c => c.name === item.prodCategory);
+        const catColor = cat ? cat.color : '#6366f1';
+
+        // Profit Rate Styling
+        let profitStyle = 'var(--text-muted)';
+        if (item.profit_rate >= 30) profitStyle = 'var(--success)';
+        else if (item.profit_rate >= 10) profitStyle = 'var(--primary)';
+
+        // Get original stock-in qty if available
+        const matchingStockIn = state.stock_in.find(s => s.product_id === item.product_id && s.expiry_date === item.expiry_date);
+        const origQty = matchingStockIn ? matchingStockIn.quantity : item.current_qty;
+
+        let actionsHtml = '';
+        if (!isArchived) {
+          actionsHtml = `
+            <button class="btn btn-primary btn-sm" style="font-size:12px; padding:6px 8px; flex:1;" onclick="markAsSoldOut('${item.product_id}', '${item.expiry_date}', '${item.prodName.replace(/'/g, "\\'")}')">소진 완료</button>
+            <button class="btn btn-danger btn-sm" style="font-size:12px; padding:6px 8px; flex:1;" onclick="discardBatchConfirm('${item.product_id}', '${item.expiry_date}', '${item.prodName.replace(/'/g, "\\'")}')">폐기</button>
+            <button class="btn btn-secondary btn-sm btn-icon-only" onclick="openEditModal('${item.product_id}', '${item.expiry_date}')" title="수정"><i data-lucide="edit-3" style="width:14px; height:14px;"></i></button>
+            <button class="btn btn-secondary btn-sm btn-icon-only" onclick="deleteBatchConfirm('${item.product_id}', '${item.expiry_date}', '${item.prodName.replace(/'/g, "\\'")}')" title="삭제"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
+          `;
+        } else {
+          actionsHtml = `
+            <button class="btn btn-secondary btn-sm" style="flex:1; font-size:12px; padding:6px 8px;" onclick="restoreBatch('${item.product_id}', '${item.expiry_date}', '${item.prodName.replace(/'/g, "\\'")}')">보관 상태로 복원</button>
+            <button class="btn btn-secondary btn-sm btn-icon-only" onclick="deleteBatchConfirm('${item.product_id}', '${item.expiry_date}', '${item.prodName.replace(/'/g, "\\'")}')" title="삭제"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
+          `;
+        }
+
+        card.innerHTML = `
+          <button class="card-fav-btn ${item.prodIsFavorite ? 'active' : ''}" onclick="toggleProductFavorite('${item.product_id}')">
+            <i data-lucide="star" style="width:18px; height:18px; fill:${item.prodIsFavorite ? '#fbbf24' : 'transparent'};"></i>
+          </button>
+          
+          <div class="product-info">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:8px; height:8px; border-radius:50%; background-color:${catColor};"></span>
+              <span style="font-size:11px; font-weight:600; color:var(--text-muted);">${item.prodCategory}</span>
+            </div>
+            <div class="product-title" title="${item.prodName}">${item.prodName}</div>
+            <div class="supplier-badge">
+              <i data-lucide="truck" style="width:12px; height:12px;"></i>
+              <span>${item.supplierName}</span>
+            </div>
+          </div>
+
+          <div class="inventory-status-row">
+            <div class="stock-amount-box">
+              <span style="font-size:11px; color:var(--text-muted); font-weight:600;">입고 수량</span>
+              <div style="display:flex; align-items:baseline; gap:2px;">
+                <span class="stock-amount">${origQty}</span>
+                <span style="font-size:12px; font-weight:600; color:var(--text-muted);">개</span>
+              </div>
+            </div>
+            <div class="price-details">
+              <div>소비자가: ₩${item.prodSellingPrice.toLocaleString()}</div>
+              <div>
+                수익률: 
+                <span class="profit-pill" style="background-color:rgba(16,185,129,0.1); color:${profitStyle};">
+                  ${item.profit_rate}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:500;">
+              <span style="color:var(--text-muted);">유통기한: ${item.expiry_date}</span>
+              <span class="badge ${badgeClass}">${badgeText}</span>
+            </div>
+
+            <div class="card-actions">
+              ${actionsHtml}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // Mark batch as sold out (소진 완료)
+    function markAsSoldOut(prodId, expiryDate, prodName) {
+      if (confirm(`[${prodName} (${expiryDate})] 품목을 소진 완료 처리하시겠습니까?\n보관 중 목록에서 숨겨집니다.`)) {
+        const invItem = state.inventory.find(i => i.product_id === prodId && i.expiry_date === expiryDate);
+        if (invItem) {
+          invItem.current_qty = 0;
+          invItem.status = 'sold_out';
+          saveStateToLocalStorage();
+          showToast(`[${prodName}] 소진 완료 처리되었습니다.`, 'success');
+          renderInventory();
+          updateDashboardAnalytics();
+        }
+      }
+    }
+
+    // Restore archived batch to active storage (보관 복원)
+    function restoreBatch(prodId, expiryDate, prodName) {
+      const invItem = state.inventory.find(i => i.product_id === prodId && i.expiry_date === expiryDate);
+      const stockIn = state.stock_in.find(s => s.product_id === prodId && s.expiry_date === expiryDate);
+      if (invItem) {
+        const origQty = stockIn ? stockIn.quantity : 10;
+        invItem.current_qty = origQty;
+        invItem.status = 'active';
+        saveStateToLocalStorage();
+        showToast(`[${prodName}] 보관 상태로 복원되었습니다 (수량: ${origQty}개).`, 'success');
+        renderInventory();
+        updateDashboardAnalytics();
+      }
+    }
+
+    // Discard batch (폐기 처리)
+    function discardBatchConfirm(prodId, expiryDate, prodName) {
+      if (confirm(`진짜로 [${prodName} (${expiryDate})] 품목을 폐기 처리하시겠습니까?`)) {
+        const invItem = state.inventory.find(i => i.product_id === prodId && i.expiry_date === expiryDate);
+        if (invItem) {
+          invItem.current_qty = 0;
+          invItem.status = 'discarded';
+          saveStateToLocalStorage();
+          showToast(`[${prodName}] 폐기 처리되었습니다.`, 'warning');
+          renderInventory();
+          updateDashboardAnalytics();
+        }
+      }
+    }
+
+    // Delete batch completely (입고 내역 삭제)
+    function deleteBatchConfirm(prodId, expiryDate, prodName) {
+      if (confirm(`[${prodName} (${expiryDate})] 입고 데이터를 완전히 삭제하시겠습니까?\n이 작업은 되돌릴 수 없으며 통계에서도 제외됩니다.`)) {
+        // Delete from stock_in
+        state.stock_in = state.stock_in.filter(s => !(s.product_id === prodId && s.expiry_date === expiryDate));
+        // Delete from inventory
+        state.inventory = state.inventory.filter(i => !(i.product_id === prodId && i.expiry_date === expiryDate));
+        
+        saveStateToLocalStorage();
+        showToast(`[${prodName}] 입고 데이터가 삭제되었습니다.`, 'danger');
+        renderInventory();
+        updateDashboardAnalytics();
+        renderRecentStockIns();
+      }
+    }
+
+    // Edit Batch Modal
+    let activeEditItem = { prodId: '', expiryDate: '' };
+
+    function openEditModal(prodId, expiryDate) {
+      activeEditItem = { prodId, expiryDate };
+      
+      const prod = state.products.find(p => p.id === prodId);
+      const inv = state.inventory.find(i => i.product_id === prodId && i.expiry_date === expiryDate);
+      const stockIn = state.stock_in.find(s => s.product_id === prodId && s.expiry_date === expiryDate);
+
+      if (!prod || !inv) return;
+
+      // Populate selects
+      const editSupplier = document.getElementById('edit-supplier');
+      const editCategory = document.getElementById('edit-category');
+
+      editSupplier.innerHTML = '';
+      state.suppliers.forEach(sup => {
+        const opt = document.createElement('option');
+        opt.value = sup.id;
+        opt.textContent = sup.name;
+        if (sup.id === prod.supplier_id) opt.selected = true;
+        editSupplier.appendChild(opt);
+      });
+
+      editCategory.innerHTML = '';
+      state.categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.name;
+        opt.textContent = cat.name;
+        if (cat.name === prod.category) opt.selected = true;
+        editCategory.appendChild(opt);
+      });
+
+      document.getElementById('edit-name').value = prod.name;
+      document.getElementById('edit-barcode').value = prod.barcode || '';
+      document.getElementById('edit-qty').value = stockIn ? stockIn.quantity : inv.current_qty;
+      document.getElementById('edit-purchase-price').value = stockIn ? stockIn.purchase_price : 0;
+      document.getElementById('edit-selling-price').value = prod.selling_price;
+      document.getElementById('edit-expiry-date').value = expiryDate;
+      document.getElementById('edit-note').value = prod.note || '';
+
+      calculateProfitMargin('edit');
+
+      document.getElementById('edit-modal').classList.add('show');
+      
+      // Initialize icons in the modal if any
+      lucide.createIcons();
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.remove('show');
+      activeEditItem = { prodId: '', expiryDate: '' };
+    }
+
+    function handleEditBatchSubmit(event) {
+      event.preventDefault();
+
+      const prodId = activeEditItem.prodId;
+      const oldExpiryDate = activeEditItem.expiryDate;
+
+      const supplierId = document.getElementById('edit-supplier').value;
+      const category = document.getElementById('edit-category').value;
+      const name = document.getElementById('edit-name').value.trim();
+      const barcode = document.getElementById('edit-barcode').value.trim();
+      const qty = parseInt(document.getElementById('edit-qty').value) || 0;
+      const purchasePrice = parseFloat(document.getElementById('edit-purchase-price').value) || 0;
+      const sellingPrice = parseFloat(document.getElementById('edit-selling-price').value) || 0;
+      const newExpiryDate = document.getElementById('edit-expiry-date').value;
+      const note = document.getElementById('edit-note').value.trim();
+
+      if (!name || qty <= 0 || !newExpiryDate) {
+        showToast('필수 항목을 모두 입력해 주세요.', 'danger');
+        return;
+      }
+
+      // Update product info
+      const prod = state.products.find(p => p.id === prodId);
+      if (prod) {
+        prod.name = name;
+        prod.category = category;
+        prod.supplier_id = supplierId;
+        prod.selling_price = sellingPrice;
+        prod.barcode = barcode;
+        prod.note = note;
+      }
+
+      // Update stock-in record
+      const stockIn = state.stock_in.find(s => s.product_id === prodId && s.expiry_date === oldExpiryDate);
+      if (stockIn) {
+        stockIn.quantity = qty;
+        stockIn.purchase_price = purchasePrice;
+        stockIn.expiry_date = newExpiryDate;
+      }
+
+      // Update inventory record
+      const profitRate = purchasePrice > 0 ? parseFloat(((sellingPrice - purchasePrice) / purchasePrice * 100).toFixed(1)) : (sellingPrice > 0 ? 100 : 0);
+      const inv = state.inventory.find(i => i.product_id === prodId && i.expiry_date === oldExpiryDate);
+      
+      if (inv) {
+        inv.expiry_date = newExpiryDate;
+        inv.profit_rate = profitRate;
+        // If batch is still active, sync quantity
+        if (inv.status === 'active' || !inv.status || inv.current_qty > 0) {
+          inv.current_qty = qty;
+          inv.status = 'active';
+        }
+      }
+
+      saveStateToLocalStorage();
+      showToast('입고 정보가 성공적으로 수정되었습니다.', 'success');
+      
+      closeEditModal();
+      renderInventory();
+      updateDashboardAnalytics();
+      renderRecentStockIns();
+    }
+
+    function renderCategoryChips() {
+      const container = document.getElementById('inventory-category-chips');
+      container.innerHTML = '';
+
+      // All chip
+      const allChip = document.createElement('div');
+
+      // Category lists
+      state.categories.forEach(cat => {
+        const chip = document.createElement('div');
+        chip.className = `chip ${activeCategoryFilter === cat.name ? 'active' : ''}`;
+        chip.innerHTML = `
+          <span style="width:6px; height:6px; border-radius:50%; background-color:${cat.color};"></span>
+          <span>${cat.name}</span>
+        `;
+        chip.onclick = () => {
+          activeCategoryFilter = cat.name;
+          renderInventory();
+        };
+        container.appendChild(chip);
+      });
+    }
+
+    // Toggle product favorite from card
+    function toggleProductFavorite(prodId) {
+      const prod = state.products.find(p => p.id === prodId);
+      if (prod) {
+        prod.is_favorite = !prod.is_favorite;
+        saveStateToLocalStorage();
+        renderInventory();
+        renderFavoritesList();
+        showToast(`[${prod.name}] 즐겨찾기가 ${prod.is_favorite ? '등록' : '해제'}되었습니다.`);
+      }
+    }
+
+
+
+    // ==========================================
+    // TAB 3: POPULARITY & STATISTICS (CHARTJS)
+    // ==========================================
+    let charts = {
+      popular: null,
+      category: null,
+      profit: null,
+      incomeExpense: null,
+      netProfit: null
+    };
+
+    function updateDashboardAnalytics() {
+      const totalProdsEl = document.getElementById('stat-total-products');
+      const totalQtyEl = document.getElementById('stat-total-qty');
+      const totalAssetsEl = document.getElementById('stat-total-assets');
+      const totalRevenueEl = document.getElementById('stat-total-revenue');
+      const avgMarginEl = document.getElementById('stat-avg-margin');
+
+      // 1. High level statistics
+      const totalProductsCount = state.products.length;
+      totalProdsEl.textContent = totalProductsCount;
+
+      let totalQty = 0;
+      let totalAssetValue = 0; // Purchase price * stock
+      let totalRevenueValue = 0; // Selling price * stock
+
+      state.inventory.forEach(inv => {
+        if (inv.current_qty > 0) {
+          totalQty += inv.current_qty;
+          const prod = state.products.find(p => p.id === inv.product_id);
+          if (prod) {
+            // Find purchase price from latest stock in or historical stock-in
+            const matchingStockIn = state.stock_in.filter(s => s.product_id === inv.product_id && s.expiry_date === inv.expiry_date);
+            const purchasePrice = matchingStockIn.length > 0 ? matchingStockIn[0].purchase_price : (prod.selling_price / 1.5);
+            
+            totalAssetValue += (purchasePrice * inv.current_qty);
+            totalRevenueValue += (prod.selling_price * inv.current_qty);
+          }
+        }
+      });
+
+      totalQtyEl.textContent = `${totalQty.toLocaleString()}개`;
+      totalAssetsEl.textContent = `₩${totalAssetValue.toLocaleString()}`;
+      totalRevenueEl.textContent = `₩${totalRevenueValue.toLocaleString()}`;
+
+      const totalProfitMargin = totalAssetValue > 0 ? ((totalRevenueValue - totalAssetValue) / totalAssetValue * 100) : (totalRevenueValue > 0 ? 100 : 0);
+      avgMarginEl.textContent = `예상 마진: ${totalProfitMargin.toFixed(1)}% (₩${(totalRevenueValue - totalAssetValue).toLocaleString()})`;
+
+      // 2. Render Charts
+      updateCharts();
+
+      // 3. Restock Cycle Analysis
+      renderRestockAnalysis();
+    }
+
+    function updateCharts() {
+      const isDark = document.documentElement.getAttribute('theme') === 'dark';
+      const textCol = isDark ? '#94a3b8' : '#64748b';
+      const gridCol = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+
+      // --- CHART 1: POPULAR ITEMS (ORDER FREQUENCY) ---
+      const popularCtx = document.getElementById('popular-chart').getContext('2d');
+      
+      // Calculate frequency of stock ins per product
+      const freq = {};
+      state.stock_in.forEach(rec => {
+        freq[rec.product_id] = (freq[rec.product_id] || 0) + 1;
+      });
+
+      const sortedFreq = Object.entries(freq)
+        .map(([id, count]) => {
+          const prod = state.products.find(p => p.id === id);
+          return { name: prod ? prod.name : '알 수 없음', count };
+        })
+        .sort((a,b) => b.count - a.count)
+        .slice(0, 8);
+
+      if (charts.popular) charts.popular.destroy();
+      charts.popular = new Chart(popularCtx, {
+        type: 'bar',
+        data: {
+          labels: sortedFreq.map(x => x.name),
+          datasets: [{
+            label: '입고 횟수',
+            data: sortedFreq.map(x => x.count),
+            backgroundColor: 'rgba(251, 191, 36, 0.75)',
+            borderColor: 'rgba(251, 191, 36, 1)',
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textCol } },
+            y: { grid: { color: gridCol }, ticks: { color: textCol, stepSize: 1 } }
+          }
+        }
+      });
+
+      // --- CHART 2: CATEGORY INVENTORY DOUGHNUT ---
+      const categoryCtx = document.getElementById('category-chart').getContext('2d');
+      const catDistribution = {};
+      
+      state.categories.forEach(c => {
+        catDistribution[c.name] = { qty: 0, color: c.color };
+      });
+
+      state.inventory.forEach(inv => {
+        if (inv.current_qty > 0) {
+          const prod = state.products.find(p => p.id === inv.product_id);
+          if (prod && catDistribution[prod.category]) {
+            catDistribution[prod.category].qty += inv.current_qty;
+          }
+        }
+      });
+
+      const catLabels = Object.keys(catDistribution);
+      const catData = Object.values(catDistribution).map(x => x.qty);
+      const catColors = Object.values(catDistribution).map(x => x.color);
+
+      if (charts.category) charts.category.destroy();
+      charts.category = new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+          labels: catLabels,
+          datasets: [{
+            data: catData,
+            backgroundColor: catColors,
+            borderWidth: isDark ? 2 : 1,
+            borderColor: isDark ? '#151f32' : '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: textCol, padding: 15 }
+            }
+          }
+        }
+      });
+
+      // --- CHART 3: CATEGORY PROFIT RATE COMPARISONS ---
+      const profitCtx = document.getElementById('profit-chart').getContext('2d');
+      const categoryProfits = {};
+
+      state.categories.forEach(c => {
+        categoryProfits[c.name] = { totalCost: 0, totalSales: 0, color: c.color };
+      });
+
+      state.inventory.forEach(inv => {
+        if (inv.current_qty > 0) {
+          const prod = state.products.find(p => p.id === inv.product_id);
+          if (prod && categoryProfits[prod.category]) {
+            const matchingStockIn = state.stock_in.filter(s => s.product_id === inv.product_id && s.expiry_date === inv.expiry_date);
+            const purchasePrice = matchingStockIn.length > 0 ? matchingStockIn[0].purchase_price : (prod.selling_price / 1.5);
+            
+            categoryProfits[prod.category].totalCost += (purchasePrice * inv.current_qty);
+            categoryProfits[prod.category].totalSales += (prod.selling_price * inv.current_qty);
+          }
+        }
+      });
+
+      const avgProfitRates = Object.keys(categoryProfits).map(catName => {
+        const item = categoryProfits[catName];
+        const rate = item.totalCost > 0 ? ((item.totalSales - item.totalCost) / item.totalCost * 100) : (item.totalSales > 0 ? 100 : 0);
+        return { name: catName, rate: parseFloat(rate.toFixed(1)), color: item.color };
+      });
+
+      if (charts.profit) charts.profit.destroy();
+      charts.profit = new Chart(profitCtx, {
+        type: 'bar',
+        data: {
+          labels: avgProfitRates.map(x => x.name),
+          datasets: [{
+            data: avgProfitRates.map(x => x.rate),
+            backgroundColor: avgProfitRates.map(x => x.color),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y', // horizontal bar chart
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { color: gridCol }, ticks: { color: textCol }, max: 100 },
+            y: { grid: { display: false }, ticks: { color: textCol } }
+          }
+        }
+      });
+    }
+
+    // Reorder interval / average purchase days tracker
+    function renderRestockAnalysis() {
+      const tbody = document.getElementById('reorder-analysis-tbody');
+      tbody.innerHTML = '';
+
+      // For each product, group stock ins by date to calculate average days between restocks
+      const restockData = [];
+
+      state.products.forEach(prod => {
+        const stockIns = state.stock_in
+          .filter(s => s.product_id === prod.id)
+          .map(s => new Date(s.date))
+          .sort((a,b) => a - b);
+
+        let averageDays = 'N/A';
+        if (stockIns.length > 1) {
+          let diffSum = 0;
+          for (let i = 1; i < stockIns.length; i++) {
+            diffSum += (stockIns[i] - stockIns[i-1]) / (1000 * 60 * 60 * 24);
+          }
+          averageDays = `${Math.round(diffSum / (stockIns.length - 1))}일`;
+        }
+
+        // Get latest restock date
+        const latestRec = state.stock_in
+          .filter(s => s.product_id === prod.id)
+          .sort((a,b) => b.date.localeCompare(a.date))[0];
+
+        const latestDate = latestRec ? latestRec.date : '-';
+
+        // Check current qty
+        const currentQty = state.inventory
+          .filter(i => i.product_id === prod.id)
+          .reduce((sum, item) => sum + item.current_qty, 0);
+
+        let statusText = '적정';
+        let statusClass = 'badge-success';
+
+        if (currentQty === 0) {
+          statusText = '소진 완료';
+          statusClass = 'badge-danger';
+        } else if (currentQty <= 5) {
+          statusText = '보관 부족 (입고 필요)';
+          statusClass = 'badge-warning';
+        }
+
+        restockData.push({
+          name: prod.name,
+          category: prod.category,
+          latestDate,
+          averageDays,
+          statusText,
+          statusClass,
+          qty: currentQty
+        });
+      });
+
+      // Filter or sort restockData to show critical ones first
+      restockData.sort((a,b) => a.qty - b.qty);
+
+      restockData.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight:700;">${item.name}</td>
+          <td><span class="badge" style="background-color: var(--accent-muted); color: var(--accent);">${item.category}</span></td>
+          <td>${item.latestDate}</td>
+          <td style="font-weight:600; color:var(--primary);">${item.averageDays}</td>
+          <td><span class="badge ${item.statusClass}">${item.statusText} (${item.qty}개)</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Favorite Quick Entries
+    function renderFavoritesList() {
+      const container = document.getElementById('quick-favorites-container');
+      container.innerHTML = '';
+
+      const favorites = state.products.filter(p => p.is_favorite);
+
+      if (favorites.length === 0) {
+        container.innerHTML = `<span style="font-size:12px; color:var(--text-muted); padding:10px 0;">재고현황 탭의 상품 카드에서 별표를 클릭해 자주 찾는 상품을 등록하세요.</span>`;
+        return;
+      }
+
+      favorites.forEach(prod => {
+        const btn = document.createElement('button');
+        btn.className = 'fav-item-btn';
+        btn.innerHTML = `
+          <i data-lucide="plus-circle" style="width:14px; height:14px;"></i>
+          <span>${prod.name}</span>
+        `;
+        btn.onclick = () => {
+          // Pre-fill manual stock-in form
+          document.getElementById('stock-name').value = prod.name;
+          document.getElementById('stock-category').value = prod.category;
+          document.getElementById('stock-supplier').value = prod.supplier_id;
+          document.getElementById('stock-selling-price').value = prod.selling_price;
+          document.getElementById('stock-barcode').value = prod.barcode || '';
+          document.getElementById('stock-note').value = prod.note || '';
+          
+          calculateProfitMargin('manual');
+          showToast(`[${prod.name}] 정보가 직접 입력 폼에 채워졌습니다.`, 'success');
+          
+          // Scroll form into view
+          document.getElementById('manual-stock-form').scrollIntoView({ behavior: 'smooth' });
+        };
+        container.appendChild(btn);
+      });
+
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // TAB 4: SETTINGS & BACKUP HANDLERS
+    // ==========================================
+    function loadConfigToUI() {
+      document.getElementById('gemini-key-input').value = state.settings.gemini_api_key || '';
+      document.getElementById('expiry-threshold').value = state.settings.alert_threshold || 7;
+    }
+
+    function togglePasswordVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      const eyeIcon = document.getElementById('gemini-key-eye');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeIcon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        eyeIcon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    function saveConfig() {
+      const key = document.getElementById('gemini-key-input').value.trim();
+      const threshold = parseInt(document.getElementById('expiry-threshold').value) || 7;
+
+      state.settings.gemini_api_key = key;
+      state.settings.alert_threshold = threshold;
+
+      saveStateToLocalStorage();
+      showToast('설정이 성공적으로 저장되었습니다.', 'success');
+    }
+
+    async function testApiKey() {
+      const key = document.getElementById('gemini-key-input').value.trim();
+      if (!key) {
+        showToast('먼저 API 키를 입력해 주세요.', 'warning');
+        return;
+      }
+
+      showToast('Gemini API 유효성을 검증 중입니다...');
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: "Hello! Reply with 'OK' if you read this." }] }]
+          })
+        });
+
+        if (response.ok) {
+          showToast('API 키 검증 성공! 정상적으로 판독 기능을 사용할 수 있습니다.', 'success');
+        } else {
+          showToast(`API 키가 유효하지 않습니다: ${response.status}`, 'danger');
+        }
+      } catch (err) {
+        showToast(`검증 중 연결 오류: ${err.message}`, 'danger');
+      }
+    }
+
+    // ==========================================
+    // TAB 5: FINANCIAL MANAGEMENT LOGIC
+    // ==========================================
+    let bankEditorBuffer = [];
+
+    // Helper: calculate date difference in days
+    function getDayDifference(d1, d2) {
+      if (!d1 || !d2 || d1 === '-' || d2 === '-') return Infinity;
+      const t1 = new Date(d1).getTime();
+      const t2 = new Date(d2).getTime();
+      if (isNaN(t1) || isNaN(t2)) return Infinity;
+      return Math.round((t2 - t1) / (1000 * 60 * 60 * 24));
+    }
+
+    function renderFinanceTab() {
+      // 1. Gather all unique months YYYY-MM
+      const monthsSet = new Set();
+      const today = new Date();
+      const currentMonthStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+      monthsSet.add(currentMonthStr);
+      
+      state.bank_records.forEach(r => {
+        monthsSet.add(`${r.year}-${String(r.month).padStart(2, '0')}`);
+      });
+      state.stock_in.forEach(s => {
+        if (s.date) {
+          monthsSet.add(s.date.substring(0, 7));
+        }
+      });
+      
+      const sortedMonths = Array.from(monthsSet).sort().reverse();
+      
+      const summarySelect = document.getElementById('finance-summary-month');
+      const reconcileSelect = document.getElementById('reconcile-month-filter');
+      const oldSummaryVal = summarySelect.value;
+      const oldReconVal = reconcileSelect.value;
+      
+      summarySelect.innerHTML = sortedMonths.map(m => `<option value="${m}">${m.substring(0,4)}년 ${m.substring(5,7)}월</option>`).join('');
+      reconcileSelect.innerHTML = sortedMonths.map(m => `<option value="${m}">${m.substring(0,4)}년 ${m.substring(5,7)}월</option>`).join('');
+      
+      if (oldSummaryVal && sortedMonths.includes(oldSummaryVal)) {
+        summarySelect.value = oldSummaryVal;
+      } else {
+        summarySelect.value = currentMonthStr;
+      }
+      if (oldReconVal && sortedMonths.includes(oldReconVal)) {
+        reconcileSelect.value = oldReconVal;
+      } else {
+        reconcileSelect.value = currentMonthStr;
+      }
+
+      // 2. Set monthly bank scan default month
+      const scanMonthInput = document.getElementById('bank-scan-month');
+      if (!scanMonthInput.value) {
+        scanMonthInput.value = currentMonthStr;
+      }
+
+      // 3. Render Dashboard Card Values for Selected Month
+      const selectedMonthStr = summarySelect.value;
+      const [selYear, selMonth] = selectedMonthStr.split('-').map(Number);
+      const record = state.bank_records.find(r => r.year === selYear && r.month === selMonth);
+      
+      const incEl = document.getElementById('finance-total-income');
+      const expEl = document.getElementById('finance-total-expense');
+      const netEl = document.getElementById('finance-total-net');
+      const netCard = document.getElementById('finance-net-card');
+      
+      if (record) {
+        incEl.textContent = `₩${record.total_income.toLocaleString()}`;
+        expEl.textContent = `₩${record.total_expense.toLocaleString()}`;
+        netEl.textContent = `${record.net_profit >= 0 ? '+' : ''}₩${record.net_profit.toLocaleString()}`;
+        
+        // Style card based on positive/negative net profit
+        if (record.net_profit > 0) {
+          netCard.style.background = 'rgba(16, 185, 129, 0.08)';
+          netCard.style.borderColor = 'rgba(16, 185, 129, 0.15)';
+          netEl.style.color = 'var(--success)';
+        } else if (record.net_profit < 0) {
+          netCard.style.background = 'rgba(239, 68, 68, 0.08)';
+          netCard.style.borderColor = 'rgba(239, 68, 68, 0.15)';
+          netEl.style.color = 'var(--danger)';
+        } else {
+          netCard.style.background = 'rgba(251, 191, 36, 0.08)';
+          netCard.style.borderColor = 'rgba(251, 191, 36, 0.15)';
+          netEl.style.color = 'var(--primary)';
+        }
+      } else {
+        incEl.textContent = '₩0';
+        expEl.textContent = '₩0';
+        netEl.textContent = '₩0';
+        netCard.style.background = 'rgba(251, 191, 36, 0.08)';
+        netCard.style.borderColor = 'rgba(251, 191, 36, 0.15)';
+        netEl.style.color = 'var(--primary)';
+      }
+
+      // 4. Render Yearly Totals
+      const yearRecords = state.bank_records.filter(r => r.year === selYear);
+      const yIncome = yearRecords.reduce((sum, r) => sum + r.total_income, 0);
+      const yExpense = yearRecords.reduce((sum, r) => sum + r.total_expense, 0);
+      const yNet = yIncome - yExpense;
+      
+      document.getElementById('yearly-total-income').textContent = `₩${yIncome.toLocaleString()}`;
+      document.getElementById('yearly-total-expense').textContent = `₩${yExpense.toLocaleString()}`;
+      const accumNetEl = document.getElementById('yearly-accum-net');
+      accumNetEl.textContent = `${yNet >= 0 ? '+' : ''}₩${yNet.toLocaleString()}`;
+      accumNetEl.style.color = yNet > 0 ? 'var(--success)' : (yNet < 0 ? 'var(--danger)' : 'var(--primary)');
+
+      // Update Chart Year Filter Options
+      const yearFilter = document.getElementById('chart-year-filter');
+      const uniqueYears = Array.from(new Set(state.bank_records.map(r => r.year)));
+      if (uniqueYears.length === 0) uniqueYears.push(today.getFullYear());
+      
+      const oldYearVal = yearFilter.value;
+      yearFilter.innerHTML = uniqueYears.sort().map(y => `<option value="${y}">${y}년</option>`).join('');
+      if (uniqueYears.includes(Number(oldYearVal))) {
+        yearFilter.value = oldYearVal;
+      } else {
+        yearFilter.value = String(selYear);
+      }
+
+      // 5. Initialize/Redraw Charts
+      initFinanceCharts();
+      
+      lucide.createIcons();
+    }
+
+    function initFinanceCharts() {
+      const yearVal = parseInt(document.getElementById('chart-year-filter').value) || 2026;
+      const isDark = document.documentElement.getAttribute('theme') === 'dark';
+      const textCol = isDark ? '#94a3b8' : '#64748b';
+      const gridCol = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+
+      const labels = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+      const incomeData = Array(12).fill(0);
+      const expenseData = Array(12).fill(0);
+      const netData = Array(12).fill(0);
+
+      // Populate month values
+      state.bank_records.forEach(r => {
+        if (r.year === yearVal && r.month >= 1 && r.month <= 12) {
+          const idx = r.month - 1;
+          incomeData[idx] = r.total_income;
+          expenseData[idx] = r.total_expense;
+          netData[idx] = r.net_profit;
+        }
+      });
+
+      // --- Chart 1: Income vs Expense Bar Chart ---
+      const ieCtx = document.getElementById('income-expense-chart').getContext('2d');
+      if (charts.incomeExpense) charts.incomeExpense.destroy();
+      charts.incomeExpense = new Chart(ieCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: '수입 (입금)',
+              data: incomeData,
+              backgroundColor: 'rgba(16, 185, 129, 0.75)',
+              borderColor: 'rgba(16, 185, 129, 1)',
+              borderWidth: 1,
+              borderRadius: 4
+            },
+            {
+              label: '지출 (출금)',
+              data: expenseData,
+              backgroundColor: 'rgba(239, 68, 68, 0.75)',
+              borderColor: 'rgba(239, 68, 68, 1)',
+              borderWidth: 1,
+              borderRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { color: textCol, font: { family: 'Outfit, sans-serif', size: 11 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ₩${context.raw.toLocaleString()}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textCol, font: { family: 'Outfit' } } },
+            y: { grid: { color: gridCol }, ticks: { color: textCol, font: { family: 'Outfit' }, callback: val => `₩${(val/10000).toLocaleString()}만` } }
+          },
+          onClick: (evt, activeElements) => {
+            if (activeElements.length > 0) {
+              const clickedIndex = activeElements[0].index;
+              const clickedMonth = clickedIndex + 1;
+              showBankMonthDetails(yearVal, clickedMonth);
+            }
+          }
+        }
+      });
+
+      // --- Chart 2: Net Profit Trend Line Chart ---
+      const npCtx = document.getElementById('net-profit-chart').getContext('2d');
+      if (charts.netProfit) charts.netProfit.destroy();
+      charts.netProfit = new Chart(npCtx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '순이익',
+            data: netData,
+            borderColor: '#fbbf24',
+            backgroundColor: 'rgba(251, 191, 36, 0.2)',
+            borderWidth: 3,
+            pointBackgroundColor: '#fbbf24',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            tension: 0.3,
+            fill: {
+              target: 'origin',
+              above: 'rgba(16, 185, 129, 0.08)',
+              below: 'rgba(239, 68, 68, 0.08)'
+            }
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `순이익: ₩${context.raw.toLocaleString()}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textCol, font: { family: 'Outfit' } } },
+            y: { 
+              grid: { color: gridCol }, 
+              ticks: { color: textCol, font: { family: 'Outfit' }, callback: val => `₩${(val/10000).toLocaleString()}만` } 
+            }
+          }
+        }
+      });
+    }
+
+    function showBankMonthDetails(year, month) {
+      const record = state.bank_records.find(r => r.year === year && r.month === month);
+      const titleEl = document.getElementById('bank-details-title');
+      const tbody = document.getElementById('bank-details-tbody');
+      
+      titleEl.textContent = `${year}년 ${month}월 통장 거래 상세 내역`;
+      tbody.innerHTML = '';
+      
+      if (!record || !record.transactions || record.transactions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">해당 월의 기록된 거래 내역이 없습니다.</td></tr>`;
+      } else {
+        const catMap = {
+          sales: '매출 (수입)',
+          purchase: '매입 (지출)',
+          utilities: '공과금 (지출)',
+          rent: '임대료 (지출)',
+          other: '기타'
+        };
+        
+        record.transactions.forEach(tx => {
+          const typeBadge = tx.type === 'income' 
+            ? `<span class="badge badge-success">입금</span>` 
+            : `<span class="badge badge-danger">출금</span>`;
+            
+          const amountText = tx.type === 'income'
+            ? `<span style="color: var(--success); font-weight: 700;">+₩${tx.amount.toLocaleString()}</span>`
+            : `<span style="color: var(--danger); font-weight: 700;">-₩${tx.amount.toLocaleString()}</span>`;
+            
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${tx.date}</td>
+            <td>${typeBadge}</td>
+            <td>${amountText}</td>
+            <td style="font-weight: 600;">${tx.description}</td>
+            <td><span class="badge" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border-color);">${catMap[tx.category] || tx.category}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+      
+      document.getElementById('bank-details-modal').classList.add('show');
+      lucide.createIcons();
+    }
+
+    function closeBankDetailsModal() {
+      document.getElementById('bank-details-modal').classList.remove('show');
+    }
+
+    // AI Bank Statement Reader Execution
+    async function runBankAiAnalysis() {
+      const apiKey = state.settings.gemini_api_key;
+      if (!apiKey) {
+        showToast('설정 탭에서 Gemini API Key를 먼저 저장해 주세요!', 'danger');
+        switchTab('settings-tab', document.querySelector('.nav-item:nth-child(5)'));
+        return;
+      }
+
+      const scanMonthVal = document.getElementById('bank-scan-month').value;
+      if (!scanMonthVal) {
+        showToast('대사 대상 월을 선택해 주세요.', 'warning');
+        return;
+      }
+
+      if (!loadedFiles.bank) {
+        showToast('분석할 통장 거래 내역 이미지를 업로드해 주세요.', 'warning');
+        return;
+      }
+
+      const loader = document.getElementById('bank-ai-loading');
+      loader.style.display = 'flex';
+
+      try {
+        const fileReader = new FileReader();
+        const fileAsBase64 = await new Promise((resolve, reject) => {
+          fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
+          fileReader.onerror = (e) => reject(e);
+          fileReader.readAsDataURL(loadedFiles.bank);
+        });
+
+        const mimeType = loadedFiles.bank.type;
+        const promptText = `
+당신은 아이스크림 및 스낵 매장 '퍼니스낵'의 회계 및 재무 담당 직원입니다.
+제공된 통장 거래 내역서 이미지를 분석하여 입금 및 출금 항목을 정확히 추출해 주세요.
+반드시 아래 규칙을 준수하여 JSON 형식으로만 응답해야 합니다.
+
+규칙:
+1. 연도와 월 정보:
+   - 사용자가 지정한 연도와 월(${scanMonthVal})을 기준으로 삼되, 통장 거래 목록에서 실제 거래 연도와 월이 다른 경우 본문의 날짜에 맞게 보정합니다.
+2. 각 거래에 대한 추출 규칙:
+   - 날짜(date)는 반드시 'YYYY-MM-DD' 형식이어야 합니다.
+   - 금액(amount)은 쉼표 등을 제외한 순수 원화 숫자(정수)여야 합니다.
+   - 거래 구분(type)은 통장 입금(예: 매출, 이자, 카드정산입금 등)인 경우 "income", 출금(예: 납품 결제, 임대료, 관리비, 전기세 등)인 경우 "expense"로 설정합니다.
+   - 적요/설명(description)은 사진 상에 표시된 상대방 명의나 적요 텍스트를 그대로 가져옵니다. (예: "빙그레", "임대료", "현금매출").
+   - 분류(category)는 아래 기준에 맞춰 분류합니다:
+     - "sales": 매장 매출 입금, 카드 정산 대금 등 수입 (type이 income인 경우 기본값)
+     - "purchase": 아이스크림, 스낵, 장난감 등 제품 납품처 결제 금액
+     - "utilities": 전기세, 수도세, 가스세, 통신비 등 공과금 지출
+     - "rent": 월세, 매장 임대료, 상가 관리비 지출
+     - "other": 기타 분류하기 어려운 지출/수입
+3. 잔액(balance) 열은 추출하지 마십시오. 오직 개별 입금/출금 거래 내용만 추출합니다.
+4. 반드시 제공된 JSON 스키마 형식으로만 응답해야 하며, 어떠한 설명이나 Markdown 포맷(예: \`\`\`json ... \`\`\`)도 포함하지 마십시오.
+
+JSON 응답 형식:
+{
+  "year": ${scanMonthVal.split('-')[0]},
+  "month": ${parseInt(scanMonthVal.split('-')[1])},
+  "transactions": [
+    {
+      "date": "${scanMonthVal}-05",
+      "type": "income",
+      "amount": 150000,
+      "description": "카드매출입금",
+      "category": "sales"
+    },
+    {
+      "date": "${scanMonthVal}-10",
+      "type": "expense",
+      "amount": 80000,
+      "description": "빙그레 대리점",
+      "category": "purchase"
+    }
+  ]
+}
+        `;
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { inline_data: { mime_type: mimeType, data: fileAsBase64 } },
+                { text: promptText }
+              ]
+            }],
+            generationConfig: {
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API 오류: ${response.status}`);
+        }
+
+        const data = await response.json();
+        let jsonStr = data.candidates[0].content.parts[0].text;
+        jsonStr = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
+        const result = JSON.parse(jsonStr);
+
+        if (result && result.transactions && result.transactions.length > 0) {
+          showToast(`AI가 통장에서 ${result.transactions.length}개의 거래를 판독했습니다! 검토를 진행하세요.`, 'success');
+          bankEditorBuffer = result.transactions;
+          
+          document.getElementById('bank-editor-month-label').textContent = scanMonthVal;
+          document.getElementById('bank-editor-title').textContent = '통장 거래 내역 검토 및 수정 (AI 판독)';
+          
+          renderBankEditorTable();
+          document.getElementById('bank-editor-modal').classList.add('show');
+        } else {
+          showToast('통장 거래 내역을 추출해내지 못했습니다. 수동 입력을 진행해 주세요.', 'warning');
+        }
+
+      } catch (err) {
+        console.error(err);
+        showToast(`통장 판독 실패: ${err.message}`, 'danger');
+      } finally {
+        loader.style.display = 'none';
+      }
+    }
+
+    function resetBankDropzone() {
+      loadedFiles.bank = null;
+      const preview = document.getElementById('bank-preview');
+      const dropzone = document.getElementById('bank-dropzone');
+      if (preview) {
+        preview.src = '';
+        preview.style.display = 'none';
+      }
+      if (dropzone) {
+        const icon = dropzone.querySelector('.upload-icon');
+        if (icon) icon.style.display = 'flex';
+        const t2 = dropzone.querySelector('div:nth-of-type(2)');
+        if (t2) {
+          t2.style.color = '';
+          t2.style.display = 'block';
+          t2.textContent = '통장 거래 내역 사진 업로드';
+        }
+        const t3 = dropzone.querySelector('div:nth-of-type(3)');
+        if (t3) {
+          t3.style.display = 'block';
+          t3.textContent = '클릭하여 파일 선택 (영업 거래 목록)';
+        }
+      }
+      document.getElementById('bank-input').value = '';
+    }
+
+    function resetReceiptDropzones() {
+      loadedFiles.receipt = null;
+      loadedFiles.label = null;
+      
+      const rPreview = document.getElementById('receipt-preview');
+      if (rPreview) {
+        rPreview.src = '';
+        rPreview.style.display = 'none';
+      }
+      const lPreview = document.getElementById('label-preview');
+      if (lPreview) {
+        lPreview.src = '';
+        lPreview.style.display = 'none';
+      }
+      
+      const rDropzone = document.getElementById('receipt-dropzone');
+      if (rDropzone) {
+        const icon = rDropzone.querySelector('.upload-icon');
+        if (icon) icon.style.display = 'flex';
+        const t2 = rDropzone.querySelector('div:nth-of-type(2)');
+        if (t2) {
+          t2.style.color = '';
+          t2.style.display = 'block';
+          t2.textContent = '영수증 업로드';
+        }
+        const t3 = rDropzone.querySelector('div:nth-of-type(3)');
+        if (t3) {
+          t3.style.display = 'block';
+          t3.textContent = '클릭하여 파일 선택';
+        }
+      }
+      
+      const lDropzone = document.getElementById('label-dropzone');
+      if (lDropzone) {
+        const icon = lDropzone.querySelector('.upload-icon');
+        if (icon) icon.style.display = 'flex';
+        const t2 = lDropzone.querySelector('div:nth-of-type(2)');
+        if (t2) {
+          t2.style.color = '';
+          t2.style.display = 'block';
+          t2.textContent = '유통기한 라벨 업로드';
+        }
+        const t3 = lDropzone.querySelector('div:nth-of-type(3)');
+        if (t3) {
+          t3.style.display = 'block';
+          t3.textContent = '클릭하여 파일 선택';
+        }
+      }
+      
+      document.getElementById('receipt-input').value = '';
+      document.getElementById('label-input').value = '';
+    }
+
+    // Modal Control: Bank Editor Modal
+    function openManualBankModal() {
+      let monthVal = document.getElementById('bank-scan-month').value;
+      if (!monthVal) {
+        const today = new Date();
+        monthVal = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+        document.getElementById('bank-scan-month').value = monthVal;
+      }
+      
+      const [year, month] = monthVal.split('-').map(Number);
+      const existing = state.bank_records.find(r => r.year === year && r.month === month);
+      
+      bankEditorBuffer = existing ? JSON.parse(JSON.stringify(existing.transactions)) : [
+        { id: generateId('tx'), date: `${monthVal}-01`, type: 'expense', amount: 0, description: '', category: 'purchase' }
+      ];
+      
+      document.getElementById('bank-editor-month-label').textContent = monthVal;
+      document.getElementById('bank-editor-title').textContent = '통장 거래 내역 수동 입력 및 편집';
+      
+      renderBankEditorTable();
+      document.getElementById('bank-editor-modal').classList.add('show');
+    }
+
+    function closeBankEditorModal() {
+      document.getElementById('bank-editor-modal').classList.remove('show');
+    }
+
+    function renderBankEditorTable() {
+      const tbody = document.getElementById('bank-editor-tbody');
+      tbody.innerHTML = '';
+      
+      bankEditorBuffer.forEach((tx, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'bank-tx-row';
+        tr.innerHTML = `
+          <td><input type="date" class="form-input tx-date" value="${tx.date}" style="padding: 4px 6px; font-size: 12px; height: 32px;"></td>
+          <td>
+            <select class="form-input tx-type" onchange="autoSelectCategoryOnTypeChange(this)" style="padding: 4px 6px; font-size: 12px; height: 32px;">
+              <option value="income" ${tx.type === 'income' ? 'selected' : ''}>입금 (수입)</option>
+              <option value="expense" ${tx.type === 'expense' ? 'selected' : ''}>출금 (지출)</option>
+            </select>
+          </td>
+          <td><input type="number" class="form-input tx-amount" value="${tx.amount || 0}" min="0" style="padding: 4px 6px; font-size: 12px; height: 32px;"></td>
+          <td><input type="text" class="form-input tx-desc" value="${tx.description || ''}" placeholder="적요 입력" oninput="autoSuggestCategory(this)" style="padding: 4px 6px; font-size: 12px; height: 32px;"></td>
+          <td>
+            <select class="form-input tx-cat" style="padding: 4px 6px; font-size: 12px; height: 32px;">
+              <option value="sales" ${tx.category === 'sales' ? 'selected' : ''}>매출 (수입)</option>
+              <option value="purchase" ${tx.category === 'purchase' ? 'selected' : ''}>매입 (지출)</option>
+              <option value="utilities" ${tx.category === 'utilities' ? 'selected' : ''}>공과금 (지출)</option>
+              <option value="rent" ${tx.category === 'rent' ? 'selected' : ''}>임대료 (지출)</option>
+              <option value="other" ${tx.category === 'other' ? 'selected' : ''}>기타</option>
+            </select>
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn btn-danger btn-icon-only btn-sm" onclick="removeBankEditorRow(${idx})" style="padding: 4px; height: 28px; width: 28px;">
+              <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      lucide.createIcons();
+    }
+
+    function syncBankBufferFromDOM() {
+      const tbody = document.getElementById('bank-editor-tbody');
+      const rows = tbody.querySelectorAll('tr.bank-tx-row');
+      const updatedBuffer = [];
+      
+      rows.forEach((row, index) => {
+        const dateInput = row.querySelector('.tx-date');
+        const typeSelect = row.querySelector('.tx-type');
+        const amountInput = row.querySelector('.tx-amount');
+        const descInput = row.querySelector('.tx-desc');
+        const catSelect = row.querySelector('.tx-cat');
+        
+        if (!dateInput) return;
+        
+        updatedBuffer.push({
+          id: bankEditorBuffer[index] ? bankEditorBuffer[index].id : generateId('tx'),
+          date: dateInput.value,
+          type: typeSelect.value,
+          amount: parseInt(amountInput.value) || 0,
+          description: descInput.value,
+          category: catSelect.value
+        });
+      });
+      
+      bankEditorBuffer = updatedBuffer;
+    }
+
+    function addBankEditorRow() {
+      syncBankBufferFromDOM();
+      
+      const monthLabel = document.getElementById('bank-editor-month-label').textContent;
+      const defaultDate = `${monthLabel}-01`;
+      
+      bankEditorBuffer.push({
+        id: generateId('tx'),
+        date: defaultDate,
+        type: 'expense',
+        amount: 0,
+        description: '',
+        category: 'purchase'
+      });
+      
+      renderBankEditorTable();
+    }
+
+    function removeBankEditorRow(index) {
+      syncBankBufferFromDOM();
+      bankEditorBuffer.splice(index, 1);
+      renderBankEditorTable();
+    }
+
+    function autoSelectCategoryOnTypeChange(selectEl) {
+      const row = selectEl.closest('tr');
+      const catSelect = row.querySelector('.tx-cat');
+      if (selectEl.value === 'income') {
+        catSelect.value = 'sales';
+      } else {
+        catSelect.value = 'purchase';
+      }
+    }
+
+    function autoSuggestCategory(inputEl) {
+      const text = inputEl.value;
+      const row = inputEl.closest('tr');
+      const catSelect = row.querySelector('.tx-cat');
+      const typeSelect = row.querySelector('.tx-type');
+      
+      const val = text.toLowerCase();
+      if (val.includes('빙그레') || val.includes('해태') || val.includes('크라운') || val.includes('롯데') || val.includes('유통') || val.includes('대리점') || val.includes('납품') || val.includes('매입')) {
+        catSelect.value = 'purchase';
+        typeSelect.value = 'expense';
+      } else if (val.includes('임대료') || val.includes('월세') || val.includes('상가') || val.includes('관리비')) {
+        catSelect.value = 'rent';
+        typeSelect.value = 'expense';
+      } else if (val.includes('전기') || val.includes('수도') || val.includes('가스') || val.includes('세금') || val.includes('공과금') || val.includes('요금')) {
+        catSelect.value = 'utilities';
+        typeSelect.value = 'expense';
+      } else if (val.includes('매출') || val.includes('카드') || val.includes('현금') || val.includes('정산') || val.includes('입금')) {
+        catSelect.value = 'sales';
+        typeSelect.value = 'income';
+      }
+    }
+
+    function saveBankEditorTransactions() {
+      syncBankBufferFromDOM();
+      
+      let hasError = false;
+      bankEditorBuffer.forEach(tx => {
+        if (!tx.date) {
+          showToast('모든 거래의 날짜를 지정해 주세요.', 'warning');
+          hasError = true;
+          return;
+        }
+        if (tx.amount <= 0) {
+          showToast('거래 금액은 0원보다 커야 합니다.', 'warning');
+          hasError = true;
+          return;
+        }
+        if (!tx.description.trim()) {
+          showToast('모든 거래의 적요(설명)를 입력해 주세요.', 'warning');
+          hasError = true;
+          return;
+        }
+      });
+      
+      if (hasError) return;
+      
+      const targetMonthStr = document.getElementById('bank-editor-month-label').textContent;
+      const [year, month] = targetMonthStr.split('-').map(Number);
+      
+      // Filter out existing record
+      state.bank_records = state.bank_records.filter(r => !(r.year === year && r.month === month));
+      
+      const total_income = bankEditorBuffer.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+      const total_expense = bankEditorBuffer.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+      const net_profit = total_income - total_expense;
+      
+      state.bank_records.push({
+        id: `bank_${year}${String(month).padStart(2, '0')}`,
+        year,
+        month,
+        transactions: bankEditorBuffer,
+        total_income,
+        total_expense,
+        net_profit,
+        created_at: getTodayString()
+      });
+      
+      saveStateToLocalStorage();
+      showToast(`${year}년 ${month}월 통장 내역이 저장되었습니다.`, 'success');
+      closeBankEditorModal();
+      resetBankDropzone();
+      renderFinanceTab();
+    }
+
+    // RECONCILIATION ENGINE
+    function runReconciliation() {
+      const targetMonth = document.getElementById('reconcile-month-filter').value;
+      const [year, month] = targetMonth.split('-').map(Number);
+      
+      // 1. Filter stock ins for this month
+      const monthlyStockIns = state.stock_in.filter(s => s.date && s.date.substring(0, 7) === targetMonth);
+      
+      if (monthlyStockIns.length === 0) {
+        showToast('선택한 달에 기록된 입고 영수증(전표)이 없습니다.', 'warning');
+        
+        // Render empty reconciliation table
+        const tbody = document.getElementById('reconciliation-tbody');
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 20px;">이 달에 입고된 상품 영수증이 존재하지 않습니다.</td></tr>`;
+        
+        document.getElementById('recon-stat-total').textContent = '0건';
+        document.getElementById('recon-stat-matched').textContent = '0건';
+        document.getElementById('recon-stat-diff').textContent = '0건';
+        document.getElementById('recon-stat-unmatched').textContent = '0건';
+        return;
+      }
+      
+      // 2. Group stock ins by photo_ref (receipt representation) or unique identifier
+      const receiptsMap = {};
+      monthlyStockIns.forEach(s => {
+        const supplier = state.suppliers.find(sup => sup.id === s.supplier_id);
+        const supplierName = supplier ? supplier.name : '알 수 없음';
+        
+        // If photo_ref is empty, group by date & supplier to represent one invoice
+        const key = s.photo_ref ? `ref_${s.photo_ref}` : `grp_${s.date}_${s.supplier_id}`;
+        
+        if (!receiptsMap[key]) {
+          receiptsMap[key] = {
+            key,
+            photo_ref: s.photo_ref || '영수증 이미지 없음 (수동 입력)',
+            date: s.date,
+            supplier_id: s.supplier_id,
+            supplierName,
+            amount: 0,
+            items: []
+          };
+        }
+        receiptsMap[key].amount += s.quantity * s.purchase_price;
+        
+        // Find product name
+        const prod = state.products.find(p => p.id === s.product_id);
+        const prodName = prod ? prod.name : '알 수 없음';
+        receiptsMap[key].items.push(`${prodName} (${s.quantity}개)`);
+      });
+      
+      const receipts = Object.values(receiptsMap);
+      
+      // 3. Find bank record for this month
+      const bankRecord = state.bank_records.find(r => r.year === year && r.month === month);
+      const bankTxs = bankRecord ? bankRecord.transactions : [];
+      
+      const matchedTxIds = new Set();
+      const reconResults = [];
+      
+      // Sort receipts by date
+      receipts.sort((a, b) => a.date.localeCompare(b.date));
+      
+      receipts.forEach(receipt => {
+        let bestMatch = null;
+        let minDiffScore = Infinity;
+        
+        // Find candidates: date +/-3 days, amount +/-5%
+        const candidates = bankTxs.filter(tx => {
+          if (tx.type !== 'expense') return false;
+          if (matchedTxIds.has(tx.id)) return false;
+          
+          const dayDiff = getDayDifference(receipt.date, tx.date);
+          if (Math.abs(dayDiff) > 3) return false;
+          
+          const amtDiffPct = Math.abs(receipt.amount - tx.amount) / receipt.amount;
+          if (amtDiffPct > 0.05) return false;
+          
+          return true;
+        });
+        
+        candidates.forEach(tx => {
+          // Score = supplier name matching bonus + date proximity + amount proximity
+          const hasDescMatch = tx.description.toLowerCase().includes(receipt.supplierName.split(' ')[0].toLowerCase()) ? 0 : 40;
+          const dayDiff = Math.abs(getDayDifference(receipt.date, tx.date));
+          const amtDiffPct = Math.abs(receipt.amount - tx.amount) / receipt.amount * 100;
+          
+          const score = hasDescMatch + dayDiff * 10 + amtDiffPct * 5;
+          if (score < minDiffScore) {
+            minDiffScore = score;
+            bestMatch = tx;
+          }
+        });
+        
+        if (bestMatch) {
+          matchedTxIds.add(bestMatch.id);
+          const amtDiff = receipt.amount - bestMatch.amount;
+          const status = amtDiff === 0 ? 'matched' : 'diff';
+          
+          reconResults.push({
+            status,
+            receiptKey: receipt.key,
+            photoRef: receipt.photo_ref,
+            receiptDate: receipt.date,
+            supplierName: receipt.supplierName,
+            receiptAmount: receipt.amount,
+            itemsList: receipt.items.join(', '),
+            txDate: bestMatch.date,
+            txDesc: bestMatch.description,
+            txAmount: bestMatch.amount,
+            difference: amtDiff
+          });
+        } else {
+          reconResults.push({
+            status: 'unmatched',
+            receiptKey: receipt.key,
+            photoRef: receipt.photo_ref,
+            receiptDate: receipt.date,
+            supplierName: receipt.supplierName,
+            receiptAmount: receipt.amount,
+            itemsList: receipt.items.join(', '),
+            txDate: '-',
+            txDesc: '-',
+            txAmount: 0,
+            difference: receipt.amount
+          });
+        }
+      });
+      
+      // 4. Update Stats counters in UI
+      const totalCount = reconResults.length;
+      const matchedCount = reconResults.filter(r => r.status === 'matched').length;
+      const diffCount = reconResults.filter(r => r.status === 'diff').length;
+      const unmatchedCount = reconResults.filter(r => r.status === 'unmatched').length;
+      
+      document.getElementById('recon-stat-total').textContent = `${totalCount}건`;
+      document.getElementById('recon-stat-matched').textContent = `${matchedCount}건`;
+      document.getElementById('recon-stat-diff').textContent = `${diffCount}건`;
+      document.getElementById('recon-stat-unmatched').textContent = `${unmatchedCount}건`;
+      
+      // 5. Render list in tbody
+      const tbody = document.getElementById('reconciliation-tbody');
+      tbody.innerHTML = '';
+      
+      reconResults.forEach(r => {
+        const tr = document.createElement('tr');
+        
+        let statusBadge = '';
+        if (r.status === 'matched') {
+          statusBadge = `<span class="badge badge-success">✅ 일치</span>`;
+        } else if (r.status === 'diff') {
+          statusBadge = `<span class="badge badge-warning">⚠️ 금액 불일치</span>`;
+        } else {
+          statusBadge = `<span class="badge badge-danger">❌ 통장 누락</span>`;
+        }
+        
+        const diffText = r.difference === 0 
+          ? `<span style="color: var(--text-muted);">-</span>` 
+          : (r.difference > 0 
+              ? `<span style="color: var(--success); font-weight: 700;">+₩${r.difference.toLocaleString()}</span>` 
+              : `<span style="color: var(--danger); font-weight: 700;">-₩${Math.abs(r.difference).toLocaleString()}</span>`);
+              
+        const bankAmtText = r.txAmount > 0 
+          ? `₩${r.txAmount.toLocaleString()}` 
+          : `<span style="color: var(--text-muted);">-</span>`;
+          
+        tr.innerHTML = `
+          <td>${statusBadge}</td>
+          <td>${r.receiptDate}</td>
+          <td>
+            <div style="font-weight: 700;">${r.supplierName}</div>
+            <div style="font-size: 10px; color: var(--text-muted);">${r.photoRef}</div>
+          </td>
+          <td style="font-weight: 700; color: var(--text);">₩${r.receiptAmount.toLocaleString()}</td>
+          <td>${r.txDate}</td>
+          <td>
+            <div style="font-weight: 600;">${r.txDesc}</div>
+          </td>
+          <td style="font-weight: 700;">${bankAmtText}</td>
+          <td>${diffText}</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="showReceiptReconPopover('${r.supplierName}', '${r.photoRef}', '${r.itemsList}')" style="padding: 4px 8px; font-size: 11px; height: 26px;">
+              보기
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      showToast(`대사가 완료되었습니다. (일치: ${matchedCount}, 누락: ${unmatchedCount})`, 'success');
+    }
+
+    function showReceiptReconPopover(supplier, ref, itemsList) {
+      alert(`[${supplier} - ${ref}]\n\n수록 품목:\n${itemsList}`);
+    }
+
+    // Export whole db as JSON backup file
+    function exportDataBackup() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href",     dataStr);
+      
+      const dateStr = getTodayString().replace(/-/g, '');
+      downloadAnchor.setAttribute("download", `funnysnak_backup_${dateStr}.json`);
+      
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast('백업 파일 다운로드가 완료되었습니다.');
+    }
+
+    // Import from JSON backup
+    function importDataBackup(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          
+          // Verify critical properties
+          if (imported.products && imported.inventory && imported.suppliers && imported.categories) {
+            state = imported;
+            if (!state.bank_records) {
+              state.bank_records = [];
+            }
+            saveStateToLocalStorage();
+            showToast('데이터 복원이 완료되었습니다!', 'success');
+            
+            // Reload all UI elements
+            populateFormDropdowns();
+            adaptCategoriesBySupplier();
+            renderRecentStockIns();
+            renderFavoritesList();
+            renderInventory();
+            renderSuppliersList();
+            renderCategoriesList();
+            loadConfigToUI();
+            updateDashboardAnalytics();
+            
+            // Reload finance tab if defined
+            if (typeof renderFinanceTab === 'function') {
+              renderFinanceTab();
+            }
+          } else {
+            showToast('올바르지 않은 백업 파일 형식입니다.', 'danger');
+          }
+        } catch (err) {
+          showToast(`복원 오류: ${err.message}`, 'danger');
+        }
+      };
+      reader.readAsText(file);
+      input.value = ''; // clear input
+    }
+
+    function resetDatabaseWithConfirm() {
+      if (confirm('진짜로 모든 데이터(상품 정보, 입고 기록, 재고, 납품처)를 전부 삭제하고 공장 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다!')) {
+        localStorage.clear();
+        showToast('전체 데이터가 초기화되었습니다. 새로고침 중입니다...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    }
+
+    // --- Excel Export (SheetJS) ---
+    function exportToExcel() {
+      if (state.inventory.length === 0) {
+        showToast('내보낼 재고 데이터가 없습니다.', 'warning');
+        return;
+      }
+
+      // Convert inventory objects to spreadsheet-friendly layout
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      const rows = state.inventory.filter(i => i.current_qty > 0).map(inv => {
+        const prod = state.products.find(p => p.id === inv.product_id);
+        const supplier = state.suppliers.find(s => s.id === (prod?.supplier_id || ''));
+        
+        // Find matching stock-in to query purchase price
+        const matchingStockIn = state.stock_in.filter(s => s.product_id === inv.product_id && s.expiry_date === inv.expiry_date);
+        const purchasePrice = matchingStockIn.length > 0 ? matchingStockIn[0].purchase_price : 0;
+        const sellingPrice = prod ? prod.selling_price : 0;
+
+        const expiry = new Date(inv.expiry_date);
+        const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+        const ddayText = diff <= 0 ? (diff === 0 ? 'D-Day' : `만료 D${diff}`) : `D-${diff}`;
+
+        return {
+          '품목코드': inv.product_id,
+          '품목명': prod ? prod.name : '알 수 없음',
+          '카테고리': prod ? prod.category : '기타',
+          '납품처': supplier ? supplier.name : '기타',
+          '현재고(개)': inv.current_qty,
+          '매입단가(원)': purchasePrice,
+          '총매입금액(원)': purchasePrice * inv.current_qty,
+          '판매가(원)': sellingPrice,
+          '총예상매출(원)': sellingPrice * inv.current_qty,
+          '수익률(%)': inv.profit_rate,
+          '유통기한': inv.expiry_date,
+          '남은일수(Dday)': ddayText
+        };
+      });
+
+      // Create sheet
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "현재 재고 현황");
+
+      // Auto-size columns slightly
+      const max_widths = [];
+      rows.forEach(row => {
+        Object.keys(row).forEach((key, colIndex) => {
+          const val = row[key] ? row[key].toString() : '';
+          const len = val.length + 5;
+          max_widths[colIndex] = Math.max(max_widths[colIndex] || 10, len);
+        });
+      });
+      worksheet['!cols'] = max_widths.map(w => ({ wgh: w }));
+
+      const dateStr = getTodayString().replace(/-/g, '');
+      XLSX.writeFile(workbook, `퍼니스낵_재고현황_${dateStr}.xlsx`);
+      showToast('재고 현황 엑셀 다운로드가 완료되었습니다.');
+    }
+
+    // --- Suppliers CRUD ---
+    function renderSuppliersList() {
+      const tbody = document.getElementById('suppliers-list-tbody');
+      tbody.innerHTML = '';
+
+      state.suppliers.forEach(sup => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight:700;">${sup.name}</td>
+          <td style="text-align:right;">
+            <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteSupplier('${sup.id}', '${sup.name.replace(/'/g, "\\'")}')" title="삭제">
+              <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function handleAddSupplier(event) {
+      event.preventDefault();
+      const nameInput = document.getElementById('new-supplier-name');
+      const name = nameInput.value.trim();
+
+      if (!name) return;
+
+      // Check duplicate
+      if (state.suppliers.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+        showToast('이미 등록된 납품처입니다.', 'warning');
+        return;
+      }
+
+      state.suppliers.push({
+        id: generateId('sup'),
+        name,
+        category_types: ['all']
+      });
+
+      saveStateToLocalStorage();
+      nameInput.value = '';
+      showToast(`납품처 [${name}] 추가되었습니다.`, 'success');
+      
+      renderSuppliersList();
+      populateFormDropdowns();
+    }
+
+    function deleteSupplier(id, name) {
+      // Check if there are products with this supplier
+      const hasProducts = state.products.some(p => p.supplier_id === id);
+      if (hasProducts) {
+        showToast('이 납품처를 사용하는 상품이 등록되어 있어 삭제할 수 없습니다.', 'danger');
+        return;
+      }
+
+      if (confirm(`납품처 [${name}]을 삭제하시겠습니까?`)) {
+        state.suppliers = state.suppliers.filter(s => s.id !== id);
+        saveStateToLocalStorage();
+        showToast('납품처가 삭제되었습니다.');
+        
+        renderSuppliersList();
+        populateFormDropdowns();
+      }
+    }
+
+    // --- Categories CRUD ---
+    function renderCategoriesList() {
+      const tbody = document.getElementById('categories-list-tbody');
+      tbody.innerHTML = '';
+
+      state.categories.forEach(cat => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight:700;">${cat.name}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-block; width:16px; height:16px; border-radius:4px; background-color:${cat.color}; border:1px solid rgba(255,255,255,0.1);"></span>
+              <span style="font-size:12px; font-family:monospace; color:var(--text-muted);">${cat.color}</span>
+            </div>
+          </td>
+          <td style="text-align:right;">
+            <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')" title="삭제">
+              <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function handleAddCategory(event) {
+      event.preventDefault();
+      const nameInput = document.getElementById('new-category-name');
+      const colorInput = document.getElementById('new-category-color');
+      const name = nameInput.value.trim();
+      const color = colorInput.value;
+
+      if (!name) return;
+
+      // Check duplicate
+      if (state.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        showToast('이미 등록된 카테고리입니다.', 'warning');
+        return;
+      }
+
+      state.categories.push({
+        id: generateId('cat'),
+        name,
+        color
+      });
+
+      saveStateToLocalStorage();
+      nameInput.value = '';
+      colorInput.value = '#3b82f6';
+      showToast(`카테고리 [${name}] 추가되었습니다.`, 'success');
+      
+      renderCategoriesList();
+      populateFormDropdowns();
+      adaptCategoriesBySupplier();
+      renderCategoryChips();
+    }
+
+    function deleteCategory(id, name) {
+      // Check if there are products with this category
+      const hasProducts = state.products.some(p => p.category === name);
+      if (hasProducts) {
+        showToast('이 카테고리를 사용하는 상품이 등록되어 있어 삭제할 수 없습니다.', 'danger');
+        return;
+      }
+
+      if (confirm(`카테고리 [${name}]을 삭제하시겠습니까?`)) {
+        state.categories = state.categories.filter(c => c.id !== id);
+        saveStateToLocalStorage();
+        showToast('카테고리가 삭제되었습니다.');
+        
+        renderCategoriesList();
+        populateFormDropdowns();
+        adaptCategoriesBySupplier();
+        renderCategoryChips();
+      }
+    }
+  </script>
+</body>
+</html>
