@@ -2058,9 +2058,10 @@
 
         // Prepopulate suppliers
         state.suppliers = [
-          { id: 'sup_001', name: '빙그레 아이스크림', category_types: ['icecream'] },
-          { id: 'sup_002', name: '해태/크라운 유통', category_types: ['snack', 'beverage'] },
-          { id: 'sup_003', name: '해피 토이 유통', category_types: ['toy'] }
+          { id: 'sup_001', name: '강릉아이스크림', category_types: ['all'] },
+          { id: 'sup_002', name: '현동몰', category_types: ['all'] },
+          { id: 'sup_003', name: '팬시나라', category_types: ['all'] },
+          { id: 'sup_004', name: '커피몰', category_types: ['all'] }
         ];
 
         // Prepopulate categories
@@ -4942,6 +4943,9 @@ JSON 응답 형식:
         tr.innerHTML = `
           <td style="font-weight:700;">${sup.name}</td>
           <td style="text-align:right;">
+            <button class="btn btn-secondary btn-sm btn-icon-only" onclick="editSupplierName('${sup.id}', '${sup.name.replace(/'/g, "\\'")}')" title="수정" style="margin-right: 4px;">
+              <i data-lucide="edit-2" style="width:14px; height:14px;"></i>
+            </button>
             <button class="btn btn-danger btn-sm btn-icon-only" onclick="deleteSupplier('${sup.id}', '${sup.name.replace(/'/g, "\\'")}')" title="삭제">
               <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
             </button>
@@ -4950,6 +4954,32 @@ JSON 응답 형식:
         tbody.appendChild(tr);
       });
       lucide.createIcons();
+    }
+
+    function editSupplierName(id, currentName) {
+      const newName = prompt('수정할 납품처 이름을 입력하세요:', currentName);
+      if (newName === null) return; // cancel
+      const name = newName.trim();
+      if (!name) {
+        showToast('납품처 이름은 비워둘 수 없습니다.', 'warning');
+        return;
+      }
+      if (name === currentName) return;
+
+      // Duplicate check (excluding itself)
+      if (state.suppliers.some(s => s.id !== id && s.name.toLowerCase() === name.toLowerCase())) {
+        showToast('이미 등록된 납품처 이름입니다.', 'warning');
+        return;
+      }
+
+      const supplier = state.suppliers.find(s => s.id === id);
+      if (supplier) {
+        supplier.name = name;
+        saveStateToLocalStorage();
+        showToast(`납품처명이 [${name}](으)로 수정되었습니다.`, 'success');
+        renderSuppliersList();
+        populateFormDropdowns();
+      }
     }
 
     function handleAddSupplier(event) {
