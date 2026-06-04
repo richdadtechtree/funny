@@ -490,6 +490,7 @@
     }
 
     /* Drop Zone for File Uploads */
+
     .upload-area {
       border: 2px dashed var(--border-color);
       border-radius: 16px;
@@ -503,6 +504,7 @@
       background-color: rgba(255,255,255,0.01);
       transition: all 0.2s ease;
       text-align: center;
+      position: relative;
     }
 
     .upload-area:hover, .upload-area.dragover {
@@ -987,23 +989,23 @@
       </div>
 
       <nav class="nav-menu">
-        <a class="nav-item active" onclick="switchTab('stock-entry-tab', this)">
+        <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('stock-entry-tab', this); return false;">
           <i data-lucide="package-plus"></i>
           <span>입고 등록</span>
         </a>
-        <a class="nav-item" onclick="switchTab('inventory-tab', this)">
+        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('inventory-tab', this); return false;">
           <i data-lucide="boxes"></i>
           <span>입고 현황</span>
         </a>
-        <a class="nav-item" onclick="switchTab('analytics-tab', this)">
+        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('analytics-tab', this); return false;">
           <i data-lucide="line-chart"></i>
           <span>인기 및 통계</span>
         </a>
-        <a class="nav-item" onclick="switchTab('finance-tab', this)">
+        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('finance-tab', this); return false;">
           <i data-lucide="wallet"></i>
           <span>재무 현황</span>
         </a>
-        <a class="nav-item" onclick="switchTab('settings-tab', this)">
+        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('settings-tab', this); return false;">
           <i data-lucide="settings"></i>
           <span>설정 및 백업</span>
         </a>
@@ -1047,18 +1049,18 @@
               </div>
               
               <div class="grid-2" style="gap: 16px; margin-bottom: 20px;">
-                <div class="upload-area" id="receipt-dropzone" onclick="triggerFileInput('receipt-input')">
+                <div class="upload-area" id="receipt-dropzone">
+                  <input type="file" id="receipt-input" accept="image/*,application/pdf" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'receipt')">
                   <div class="upload-icon"><i data-lucide="receipt"></i></div>
                   <div style="font-size: 13px; font-weight: 600;">영수증 업로드</div>
                   <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택</div>
-                  <input type="file" id="receipt-input" accept="image/*,application/pdf" style="display: none;" onchange="handleFileSelected(this, 'receipt')">
                   <img id="receipt-preview" class="upload-preview" alt="미리보기">
                 </div>
-                <div class="upload-area" id="label-dropzone" onclick="triggerFileInput('label-input')">
+                <div class="upload-area" id="label-dropzone">
+                  <input type="file" id="label-input" accept="image/*" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'label')">
                   <div class="upload-icon"><i data-lucide="calendar"></i></div>
                   <div style="font-size: 13px; font-weight: 600;">유통기한 라벨 업로드</div>
                   <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택</div>
-                  <input type="file" id="label-input" accept="image/*" style="display: none;" onchange="handleFileSelected(this, 'label')">
                   <img id="label-preview" class="upload-preview" alt="미리보기">
                 </div>
               </div>
@@ -1458,11 +1460,11 @@
               <input type="month" id="bank-scan-month" class="form-input">
             </div>
 
-            <div class="upload-area" id="bank-dropzone" onclick="triggerFileInput('bank-input')" style="margin-bottom: 16px; height: 130px;">
+            <div class="upload-area" id="bank-dropzone" style="margin-bottom: 16px; height: 130px;">
+              <input type="file" id="bank-input" accept="image/*,application/pdf" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'bank')">
               <div class="upload-icon"><i data-lucide="file-text"></i></div>
               <div style="font-size: 13px; font-weight: 600;">통장 거래 내역 사진 업로드</div>
               <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택 (영업 거래 목록)</div>
-              <input type="file" id="bank-input" accept="image/*,application/pdf" style="display: none;" onchange="handleFileSelected(this, 'bank')">
               <img id="bank-preview" class="upload-preview" alt="미리보기">
             </div>
 
@@ -1699,7 +1701,8 @@
                 </div>
               </button>
 
-              <div class="upload-area" id="restore-dropzone" onclick="triggerFileInput('restore-file-input')" style="padding: 16px; border-style: solid; border-width: 1px;">
+              <div class="upload-area" id="restore-dropzone" style="padding: 16px; border-style: solid; border-width: 1px;">
+                <input type="file" id="restore-file-input" accept=".json" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="importDataBackup(this)">
                 <div style="display:flex; align-items:center; gap:12px; width:100%; text-align:left;">
                   <div class="upload-icon" style="width:36px; height:36px;"><i data-lucide="download-cloud" style="width:18px; height:18px;"></i></div>
                   <div>
@@ -1707,7 +1710,6 @@
                     <div style="font-weight: 400; font-size:12px; color: var(--text-muted);">기존 데이터를 백업 JSON 파일로 덮어씌웁니다.</div>
                   </div>
                 </div>
-                <input type="file" id="restore-file-input" accept=".json" style="display: none;" onchange="importDataBackup(this)">
               </div>
 
               <button class="btn btn-danger" style="margin-top: 12px;" onclick="resetDatabaseWithConfirm()">
@@ -1791,23 +1793,23 @@
 
   <!-- Mobile Bottom Nav -->
   <nav class="mobile-nav">
-    <a class="mobile-nav-item active" onclick="switchTab('stock-entry-tab', this)">
+    <a href="javascript:void(0)" class="mobile-nav-item active" onclick="switchTab('stock-entry-tab', this); return false;">
       <i data-lucide="package-plus"></i>
       <span>입고 등록</span>
     </a>
-    <a class="mobile-nav-item" onclick="switchTab('inventory-tab', this)">
+    <a href="javascript:void(0)" class="mobile-nav-item" onclick="switchTab('inventory-tab', this); return false;">
       <i data-lucide="boxes"></i>
       <span>입고 현황</span>
     </a>
-    <a class="mobile-nav-item" onclick="switchTab('analytics-tab', this)">
+    <a href="javascript:void(0)" class="mobile-nav-item" onclick="switchTab('analytics-tab', this); return false;">
       <i data-lucide="line-chart"></i>
       <span>통계</span>
     </a>
-    <a class="mobile-nav-item" onclick="switchTab('finance-tab', this)">
+    <a href="javascript:void(0)" class="mobile-nav-item" onclick="switchTab('finance-tab', this); return false;">
       <i data-lucide="wallet"></i>
       <span>재무</span>
     </a>
-    <a class="mobile-nav-item" onclick="switchTab('settings-tab', this)">
+    <a href="javascript:void(0)" class="mobile-nav-item" onclick="switchTab('settings-tab', this); return false;">
       <i data-lucide="settings"></i>
       <span>설정</span>
     </a>
