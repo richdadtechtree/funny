@@ -1212,6 +1212,17 @@
             Gemini가 영수증에서 품목을 추출했습니다. 내용을 확인하고 수정한 뒤 저장 버튼을 눌러주세요.
           </p>
 
+          <!-- 판매가 일괄 입력 -->
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 14px 16px; background: var(--accent-muted); border: 1px solid rgba(99,102,241,0.2); border-radius: 12px;">
+            <i data-lucide="tag" style="color: var(--accent); flex-shrink: 0;"></i>
+            <span style="font-size: 14px; font-weight: 600; white-space: nowrap;">판매가 일괄 적용</span>
+            <input type="number" id="bulk-selling-price" min="0" placeholder="판매가 입력 후 적용" style="flex: 1; max-width: 200px; padding: 8px 12px; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); font-size: 14px;">
+            <button class="btn btn-accent btn-sm" onclick="applyBulkSellingPrice()">
+              <i data-lucide="check"></i>
+              전체 적용
+            </button>
+          </div>
+
           <div class="table-container" style="margin-bottom: 20px;">
             <table>
               <thead>
@@ -3038,6 +3049,25 @@ JSON 응답 형식:
       card.style.display = 'block';
       card.scrollIntoView({ behavior: 'smooth' });
       lucide.createIcons();
+    }
+
+    function applyBulkSellingPrice() {
+      const price = parseFloat(document.getElementById('bulk-selling-price').value);
+      if (!price || price <= 0) {
+        showToast('적용할 판매가를 입력해 주세요.', 'warning');
+        return;
+      }
+      aiExtractedBuffer.forEach(item => {
+        item.selling_price = price;
+        // Update each row's input field
+        const row = document.getElementById(`verification-row-${item.tempId}`);
+        if (row) {
+          const sellingInput = row.querySelectorAll('input[type="number"]')[2];
+          if (sellingInput) sellingInput.value = price;
+          recalcRowProfit(item.tempId);
+        }
+      });
+      showToast(`전체 ${aiExtractedBuffer.length}개 품목에 판매가 ${price.toLocaleString()}원 적용됨.`, 'success');
     }
 
     function updateBuffer(index, field, value) {
