@@ -1174,8 +1174,8 @@
 
               <div class="grid-2">
                 <div class="form-group">
-                  <label for="stock-expiry-date">유통기한 *</label>
-                  <input type="date" id="stock-expiry-date" required>
+                  <label for="stock-expiry-date">유통기한</label>
+                  <input type="date" id="stock-expiry-date">
                 </div>
                 <div class="form-group">
                   <label>마진율 / 수익률</label>
@@ -2358,7 +2358,7 @@
       
       initAppDatabase();
       initDragAndDrop();
-      document.getElementById('stock-expiry-date').value = getTodayString();
+      document.getElementById('stock-expiry-date').value = '';
       lucide.createIcons();
     });
 
@@ -2701,7 +2701,7 @@
       document.getElementById('stock-qty').value = '10';
       document.getElementById('stock-purchase-price').value = '500';
       document.getElementById('stock-selling-price').value = '1000';
-      document.getElementById('stock-expiry-date').value = getTodayString();
+      document.getElementById('stock-expiry-date').value = '';
       document.getElementById('stock-note').value = '';
       calculateProfitMargin('manual');
     }
@@ -2966,7 +2966,7 @@ JSON 응답 형식:
         const category = defaultCatVal || (existingProd ? existingProd.category : (state.categories[0]?.name || ''));
         const supplierId = defaultSupplierVal || (existingProd ? existingProd.supplier_id : (state.suppliers[0]?.id || ''));
         const selling = existingProd ? existingProd.selling_price : (purchase * 1.5);
-        const expiry = item.expiry_date || getTodayString();
+        const expiry = item.expiry_date || '';
 
         const bufferItem = {
           tempId: index,
