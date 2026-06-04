@@ -490,13 +490,6 @@
     }
 
     /* Drop Zone for File Uploads */
-    label.upload-area {
-      font-weight: inherit;
-      font-size: inherit;
-      color: inherit;
-      margin: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
 
     .upload-area {
       border: 2px dashed var(--border-color);
@@ -511,6 +504,7 @@
       background-color: rgba(255,255,255,0.01);
       transition: all 0.2s ease;
       text-align: center;
+      position: relative;
     }
 
     .upload-area:hover, .upload-area.dragover {
@@ -1055,20 +1049,20 @@
               </div>
               
               <div class="grid-2" style="gap: 16px; margin-bottom: 20px;">
-                <label class="upload-area" id="receipt-dropzone" for="receipt-input">
+                <div class="upload-area" id="receipt-dropzone">
+                  <input type="file" id="receipt-input" accept="image/*,application/pdf" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'receipt')">
                   <div class="upload-icon"><i data-lucide="receipt"></i></div>
                   <div style="font-size: 13px; font-weight: 600;">영수증 업로드</div>
                   <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택</div>
-                  <input type="file" id="receipt-input" accept="image/*,application/pdf" style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden;" onchange="handleFileSelected(this, 'receipt')">
                   <img id="receipt-preview" class="upload-preview" alt="미리보기">
-                </label>
-                <label class="upload-area" id="label-dropzone" for="label-input">
+                </div>
+                <div class="upload-area" id="label-dropzone">
+                  <input type="file" id="label-input" accept="image/*" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'label')">
                   <div class="upload-icon"><i data-lucide="calendar"></i></div>
                   <div style="font-size: 13px; font-weight: 600;">유통기한 라벨 업로드</div>
                   <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택</div>
-                  <input type="file" id="label-input" accept="image/*" style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden;" onchange="handleFileSelected(this, 'label')">
                   <img id="label-preview" class="upload-preview" alt="미리보기">
-                </label>
+                </div>
               </div>
 
               <!-- Default Category Option Selection for AI Scan -->
@@ -1466,13 +1460,13 @@
               <input type="month" id="bank-scan-month" class="form-input">
             </div>
 
-            <label class="upload-area" id="bank-dropzone" for="bank-input" style="margin-bottom: 16px; height: 130px;">
+            <div class="upload-area" id="bank-dropzone" style="margin-bottom: 16px; height: 130px;">
+              <input type="file" id="bank-input" accept="image/*,application/pdf" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'bank')">
               <div class="upload-icon"><i data-lucide="file-text"></i></div>
               <div style="font-size: 13px; font-weight: 600;">통장 거래 내역 사진 업로드</div>
               <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택 (영업 거래 목록)</div>
-              <input type="file" id="bank-input" accept="image/*,application/pdf" style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden;" onchange="handleFileSelected(this, 'bank')">
               <img id="bank-preview" class="upload-preview" alt="미리보기">
-            </label>
+            </div>
 
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-primary" style="flex: 1;" onclick="runBankAiAnalysis()">
@@ -1707,7 +1701,8 @@
                 </div>
               </button>
 
-              <label class="upload-area" id="restore-dropzone" for="restore-file-input" style="padding: 16px; border-style: solid; border-width: 1px;">
+              <div class="upload-area" id="restore-dropzone" style="padding: 16px; border-style: solid; border-width: 1px;">
+                <input type="file" id="restore-file-input" accept=".json" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="importDataBackup(this)">
                 <div style="display:flex; align-items:center; gap:12px; width:100%; text-align:left;">
                   <div class="upload-icon" style="width:36px; height:36px;"><i data-lucide="download-cloud" style="width:18px; height:18px;"></i></div>
                   <div>
@@ -1715,8 +1710,7 @@
                     <div style="font-weight: 400; font-size:12px; color: var(--text-muted);">기존 데이터를 백업 JSON 파일로 덮어씌웁니다.</div>
                   </div>
                 </div>
-                <input type="file" id="restore-file-input" accept=".json" style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden;" onchange="importDataBackup(this)">
-              </label>
+              </div>
 
               <button class="btn btn-danger" style="margin-top: 12px;" onclick="resetDatabaseWithConfirm()">
                 <i data-lucide="trash-2"></i>
