@@ -2976,7 +2976,7 @@ JSON 응답 형식:
         const defaultSupplierVal = defaultSupplierSelect ? defaultSupplierSelect.value : '';
         const category = defaultCatVal || (existingProd ? existingProd.category : (state.categories[0]?.name || ''));
         const supplierId = defaultSupplierVal || (existingProd ? existingProd.supplier_id : (state.suppliers[0]?.id || ''));
-        const selling = existingProd ? existingProd.selling_price : (purchase * 1.5);
+        const selling = existingProd ? existingProd.selling_price : 0;
         const expiry = item.expiry_date || '';
 
         const bufferItem = {
@@ -3031,7 +3031,7 @@ JSON 응답 형식:
             <input type="number" min="0" value="${purchase}" oninput="updateBuffer(${index}, 'purchase_price', parseFloat(this.value) || 0); recalcRowProfit(${index})">
           </td>
           <td>
-            <input type="number" min="0" value="${selling}" oninput="updateBuffer(${index}, 'selling_price', parseFloat(this.value) || 0); recalcRowProfit(${index})">
+            <input type="number" min="0" value="${selling || ''}" placeholder="판매가 입력" oninput="updateBuffer(${index}, 'selling_price', parseFloat(this.value) || 0); recalcRowProfit(${index})">
           </td>
           <td>
             <input type="date" value="${expiry}" oninput="updateBuffer(${index}, 'expiry_date', this.value)">
