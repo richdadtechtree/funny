@@ -1069,15 +1069,26 @@
                 </div>
               </div>
 
-              <!-- Default Category Option Selection for AI Scan -->
-              <div style="margin-bottom: 20px;">
-                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
-                  <i data-lucide="tag" style="width: 14px; height: 14px; color: var(--primary);"></i>
-                  <span>기본 카테고리 지정 (선택)</span>
-                </label>
-                <select id="ai-default-category" style="width: 100%; height: 38px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); outline: none; transition: border-color 0.2s;">
-                  <option value="">(자동 분류 또는 선택 안 함)</option>
-                </select>
+              <!-- Default Supplier & Category Selection for AI Scan -->
+              <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
+                    <i data-lucide="truck" style="width: 14px; height: 14px; color: var(--primary);"></i>
+                    <span>납품처 지정 <span style="color: var(--danger);">*</span></span>
+                  </label>
+                  <select id="ai-default-supplier" style="width: 100%; height: 38px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); outline: none; transition: border-color 0.2s;">
+                    <option value="">(납품처 선택)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
+                    <i data-lucide="tag" style="width: 14px; height: 14px; color: var(--primary);"></i>
+                    <span>기본 카테고리 지정 (선택)</span>
+                  </label>
+                  <select id="ai-default-category" style="width: 100%; height: 38px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); outline: none; transition: border-color 0.2s;">
+                    <option value="">(자동 분류 또는 선택 안 함)</option>
+                  </select>
+                </div>
               </div>
 
               <button class="btn btn-primary" style="width: 100%;" onclick="runAiAnalysis()">
@@ -2427,6 +2438,22 @@
         filterSupplier.appendChild(filterOpt);
       });
 
+      // AI Default Supplier dropdown
+      const aiDefaultSupSelect = document.getElementById('ai-default-supplier');
+      if (aiDefaultSupSelect) {
+        const savedSupVal = aiDefaultSupSelect.value;
+        aiDefaultSupSelect.innerHTML = '<option value="">(납품처 선택)</option>';
+        state.suppliers.forEach(sup => {
+          const option = document.createElement('option');
+          option.value = sup.id;
+          option.textContent = sup.name;
+          aiDefaultSupSelect.appendChild(option);
+        });
+        if (savedSupVal && state.suppliers.some(s => s.id === savedSupVal)) {
+          aiDefaultSupSelect.value = savedSupVal;
+        }
+      }
+
       // AI Default Category dropdown
       const aiDefaultCatSelect = document.getElementById('ai-default-category');
       if (aiDefaultCatSelect) {
@@ -2922,8 +2949,10 @@ JSON 응답 형식:
         const existingProd = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
         const defaultCatSelect = document.getElementById('ai-default-category');
         const defaultCatVal = defaultCatSelect ? defaultCatSelect.value : '';
+        const defaultSupplierSelect = document.getElementById('ai-default-supplier');
+        const defaultSupplierVal = defaultSupplierSelect ? defaultSupplierSelect.value : '';
         const category = defaultCatVal || (existingProd ? existingProd.category : (state.categories[0]?.name || ''));
-        const supplierId = existingProd ? existingProd.supplier_id : (state.suppliers[0]?.id || '');
+        const supplierId = defaultSupplierVal || (existingProd ? existingProd.supplier_id : (state.suppliers[0]?.id || ''));
         const selling = existingProd ? existingProd.selling_price : (purchase * 1.5);
         const expiry = item.expiry_date || getTodayString();
 
