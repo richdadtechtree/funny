@@ -795,7 +795,8 @@
     }
 
     /* Table Design */
-    .table-container {
+    .table-container,
+    .table-wrapper {
       overflow-x: auto;
       border-radius: 12px;
       border: 1px solid var(--border-color);
@@ -1606,7 +1607,8 @@
                   <th>영수증 입고일</th>
                   <th>납품처</th>
                   <th>영수증 금액</th>
-                  <th>매칭 통장일 (적요)</th>
+                  <th>매칭 통장일</th>
+                  <th>적요/설명</th>
                   <th>통장 금액</th>
                   <th>차액</th>
                   <th>상세</th>
@@ -1614,7 +1616,7 @@
               </thead>
               <tbody id="reconciliation-tbody">
                 <tr>
-                  <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">[대사 실행] 버튼을 눌러 분석을 시작하세요.</td>
+                  <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 20px;">[대사 실행] 버튼을 눌러 분석을 시작하세요.</td>
                 </tr>
               </tbody>
             </table>
@@ -2796,7 +2798,7 @@
       const apiKey = state.settings.gemini_api_key;
       if (!apiKey) {
         showToast('설정 탭에서 Gemini API Key를 먼저 저장해 주세요!', 'danger');
-        switchTab('settings-tab', document.querySelector('.nav-item:nth-child(4)'));
+        switchTab('settings-tab', document.querySelector('.nav-item:nth-child(5)'));
         return;
       }
 
@@ -3498,6 +3500,13 @@ JSON 응답 형식:
 
       // All chip
       const allChip = document.createElement('div');
+      allChip.className = `chip ${activeCategoryFilter === 'all' ? 'active' : ''}`;
+      allChip.innerHTML = `<span>전체</span>`;
+      allChip.onclick = () => {
+        activeCategoryFilter = 'all';
+        renderInventory();
+      };
+      container.appendChild(allChip);
 
       // Category lists
       state.categories.forEach(cat => {
@@ -4631,18 +4640,20 @@ JSON 응답 형식:
       // 2. Group stock ins by photo_ref (receipt representation) or unique identifier
       const receiptsMap = {};
       monthlyStockIns.forEach(s => {
-        const supplier = state.suppliers.find(sup => sup.id === s.supplier_id);
+        const prod = state.products.find(p => p.id === s.product_id);
+        const supplierId = prod ? prod.supplier_id : '';
+        const supplier = supplierId ? state.suppliers.find(sup => sup.id === supplierId) : null;
         const supplierName = supplier ? supplier.name : '알 수 없음';
-        
+
         // If photo_ref is empty, group by date & supplier to represent one invoice
-        const key = s.photo_ref ? `ref_${s.photo_ref}` : `grp_${s.date}_${s.supplier_id}`;
-        
+        const key = s.photo_ref ? `ref_${s.photo_ref}` : `grp_${s.date}_${supplierId}`;
+
         if (!receiptsMap[key]) {
           receiptsMap[key] = {
             key,
             photo_ref: s.photo_ref || '영수증 이미지 없음 (수동 입력)',
             date: s.date,
-            supplier_id: s.supplier_id,
+            supplier_id: supplierId,
             supplierName,
             amount: 0,
             items: []
