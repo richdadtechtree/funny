@@ -5011,7 +5011,7 @@ JSON 응답 형식:
 
     function deleteSupplier(id, name) {
       // Check if there are products with this supplier
-      const hasProducts = state.products.some(p => p.supplier_id === id);
+      const hasProducts = state.products && state.products.some(p => p.supplier_id === id);
       if (hasProducts) {
         showToast('이 납품처를 사용하는 상품이 등록되어 있어 삭제할 수 없습니다.', 'danger');
         return;
