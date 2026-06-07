@@ -93,7 +93,7 @@ app.post('/api/draft', (req, res) => {
 });
 
 // Fallback route to serve UI
-app.get('*', (req, res) => {
+app.get('(.*)', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
