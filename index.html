@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="ko" theme="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>퍼니스낵 재고관리 시스템</title>
-  
+
   <!-- Google Fonts: Outfit & Noto Sans KR -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
+
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+
   <!-- SheetJS CDN for Excel Export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  
+
   <!-- HTML5-QRCode Scanner for Barcode Scanning -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
@@ -102,13 +105,16 @@
       width: 6px;
       height: 6px;
     }
+
     ::-webkit-scrollbar-track {
       background: transparent;
     }
+
     ::-webkit-scrollbar-thumb {
       background: var(--border-color);
       border-radius: 4px;
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: var(--text-muted);
     }
@@ -287,8 +293,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .section-header {
@@ -463,7 +476,7 @@
     }
 
     .btn-secondary:hover {
-      background-color: rgba(255,255,255,0.05);
+      background-color: rgba(255, 255, 255, 0.05);
     }
 
     .btn-accent {
@@ -505,13 +518,14 @@
       justify-content: center;
       gap: 12px;
       cursor: pointer;
-      background-color: rgba(255,255,255,0.01);
+      background-color: rgba(255, 255, 255, 0.01);
       transition: all 0.2s ease;
       text-align: center;
       position: relative;
     }
 
-    .upload-area:hover, .upload-area.dragover {
+    .upload-area:hover,
+    .upload-area.dragover {
       border-color: var(--primary);
       background-color: rgba(251, 191, 36, 0.03);
     }
@@ -553,7 +567,7 @@
       color: var(--text);
       padding: 16px 20px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -569,9 +583,17 @@
       transform: translateX(0);
     }
 
-    .toast-success { border-left-color: var(--success); }
-    .toast-danger { border-left-color: var(--danger); }
-    .toast-warning { border-left-color: var(--warning); }
+    .toast-success {
+      border-left-color: var(--success);
+    }
+
+    .toast-danger {
+      border-left-color: var(--danger);
+    }
+
+    .toast-warning {
+      border-left-color: var(--warning);
+    }
 
     /* Tags and Badges */
     .badge {
@@ -586,17 +608,32 @@
       letter-spacing: 0.5px;
     }
 
-    .badge-danger { background-color: var(--danger-bg); color: var(--danger); }
-    .badge-warning { background-color: var(--warning-bg); color: var(--warning); }
-    .badge-alert { background-color: var(--alert-bg); color: var(--alert); }
-    .badge-success { background-color: var(--success-bg); color: var(--success); }
+    .badge-danger {
+      background-color: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .badge-warning {
+      background-color: var(--warning-bg);
+      color: var(--warning);
+    }
+
+    .badge-alert {
+      background-color: var(--alert-bg);
+      color: var(--alert);
+    }
+
+    .badge-success {
+      background-color: var(--success-bg);
+      color: var(--success);
+    }
 
     /* Category Filter Chips */
     .filter-scroll-wrapper {
       overflow-x: auto;
       padding-bottom: 4px;
     }
-    
+
     .filter-chips {
       display: flex;
       gap: 8px;
@@ -768,14 +805,21 @@
       border-radius: 20px;
       width: 100%;
       max-width: 500px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
       overflow: hidden;
       animation: modalSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.175);
     }
 
     @keyframes modalSlide {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     .modal-header {
@@ -856,12 +900,15 @@
     table input[type="date"] {
       min-width: 135px !important;
     }
+
     table select {
       min-width: 110px !important;
     }
+
     table input[type="number"] {
       min-width: 80px !important;
     }
+
     table input[type="text"] {
       min-width: 140px !important;
     }
@@ -893,7 +940,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* Barcode reader block */
@@ -952,23 +1001,31 @@
       aside.sidebar {
         display: none;
       }
+
       .mobile-header {
         display: flex;
       }
+
       .mobile-nav {
         display: flex;
       }
+
       main.main-content {
         padding: 20px;
-        padding-bottom: 80px; /* Safe space for mobile bottom nav */
+        padding-bottom: 80px;
+        /* Safe space for mobile bottom nav */
         gap: 20px;
       }
-      .grid-2, .grid-3, .grid-4 {
+
+      .grid-2,
+      .grid-3,
+      .grid-4 {
         grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
+
 <body>
 
   <!-- Mobile Header -->
@@ -993,7 +1050,8 @@
       </div>
 
       <nav class="nav-menu">
-        <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('stock-entry-tab', this); return false;">
+        <a href="javascript:void(0)" class="nav-item active"
+          onclick="switchTab('stock-entry-tab', this); return false;">
           <i data-lucide="package-plus"></i>
           <span>입고 등록</span>
         </a>
@@ -1051,17 +1109,21 @@
                 </div>
                 <span class="badge badge-success">Gemini 2.5 Flash</span>
               </div>
-              
+
               <div class="grid-2" style="gap: 16px; margin-bottom: 20px;">
                 <div class="upload-area" id="receipt-dropzone">
-                  <input type="file" id="receipt-input" accept="image/*,application/pdf" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'receipt')">
+                  <input type="file" id="receipt-input" accept="image/*,application/pdf"
+                    style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;"
+                    onchange="handleFileSelected(this, 'receipt')">
                   <div class="upload-icon"><i data-lucide="receipt"></i></div>
                   <div style="font-size: 13px; font-weight: 600;">영수증 업로드</div>
                   <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택</div>
                   <img id="receipt-preview" class="upload-preview" alt="미리보기">
                 </div>
                 <div class="upload-area" id="label-dropzone">
-                  <input type="file" id="label-input" accept="image/*" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'label')">
+                  <input type="file" id="label-input" accept="image/*"
+                    style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;"
+                    onchange="handleFileSelected(this, 'label')">
                   <div class="upload-icon"><i data-lucide="calendar"></i></div>
                   <div style="font-size: 13px; font-weight: 600;">유통기한 라벨 업로드</div>
                   <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택</div>
@@ -1072,29 +1134,40 @@
               <!-- Default Supplier & Category Selection for AI Scan -->
               <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px;">
                 <div>
-                  <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
+                  <label
+                    style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
                     <i data-lucide="truck" style="width: 14px; height: 14px; color: var(--primary);"></i>
                     <span>납품처 지정 <span style="color: var(--danger);">*</span></span>
                   </label>
-                  <select id="ai-default-supplier" style="width: 100%; height: 38px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); outline: none; transition: border-color 0.2s;">
+                  <select id="ai-default-supplier"
+                    style="width: 100%; height: 38px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); outline: none; transition: border-color 0.2s;">
                     <option value="">(납품처 선택)</option>
                   </select>
                 </div>
                 <div>
-                  <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
+                  <label
+                    style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;">
                     <i data-lucide="tag" style="width: 14px; height: 14px; color: var(--primary);"></i>
                     <span>기본 카테고리 지정 (선택)</span>
                   </label>
-                  <select id="ai-default-category" style="width: 100%; height: 38px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); outline: none; transition: border-color 0.2s;">
+                  <select id="ai-default-category"
+                    style="width: 100%; height: 38px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); outline: none; transition: border-color 0.2s;">
                     <option value="">(자동 분류 또는 선택 안 함)</option>
                   </select>
                 </div>
               </div>
 
-              <button class="btn btn-primary" style="width: 100%;" onclick="runAiAnalysis()">
-                <i data-lucide="sparkles"></i>
-                <span>AI 분석 시작하기</span>
-              </button>
+              <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="runAiAnalysis()">
+                  <i data-lucide="sparkles"></i>
+                  <span>AI 분석 시작하기</span>
+                </button>
+                <button id="btn-load-draft" class="btn btn-secondary" style="display: none;"
+                  onclick="loadDraftToVerification()" title="임시 저장된 분석 내역 불러오기">
+                  <i data-lucide="folder-open" style="color: var(--primary);"></i>
+                  <span>임시저장 불러오기</span>
+                </button>
+              </div>
 
               <div id="ai-loading" class="spinner-overlay" style="display: none;">
                 <div class="spinner"></div>
@@ -1146,7 +1219,8 @@
                 <label for="stock-barcode">바코드</label>
                 <div class="input-with-icon">
                   <input type="text" id="stock-barcode" placeholder="스캔 또는 직접 입력">
-                  <button type="button" class="input-icon-btn" onclick="openBarcodeScanner('stock-barcode')" title="바코드 스캔">
+                  <button type="button" class="input-icon-btn" onclick="openBarcodeScanner('stock-barcode')"
+                    title="바코드 스캔">
                     <i data-lucide="scan-line"></i>
                   </button>
                 </div>
@@ -1164,11 +1238,13 @@
                 </div>
                 <div class="form-group">
                   <label for="stock-purchase-price">매입 단가 (원) *</label>
-                  <input type="number" id="stock-purchase-price" required min="0" placeholder="개당 매입가" value="500" oninput="calculateProfitMargin('manual')">
+                  <input type="number" id="stock-purchase-price" required min="0" placeholder="개당 매입가" value="500"
+                    oninput="calculateProfitMargin('manual')">
                 </div>
                 <div class="form-group">
                   <label for="stock-selling-price">판매가 (원) *</label>
-                  <input type="number" id="stock-selling-price" required min="0" placeholder="소비자가" value="1000" oninput="calculateProfitMargin('manual')">
+                  <input type="number" id="stock-selling-price" required min="0" placeholder="소비자가" value="1000"
+                    oninput="calculateProfitMargin('manual')">
                 </div>
               </div>
 
@@ -1179,7 +1255,8 @@
                 </div>
                 <div class="form-group">
                   <label>마진율 / 수익률</label>
-                  <div id="manual-profit-display" style="padding: 12px 0; font-size: 16px; font-weight: 800; color: var(--success);">
+                  <div id="manual-profit-display"
+                    style="padding: 12px 0; font-size: 16px; font-weight: 800; color: var(--success);">
                     50.0%
                   </div>
                 </div>
@@ -1213,10 +1290,12 @@
           </p>
 
           <!-- 판매가 일괄 입력 -->
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 14px 16px; background: var(--accent-muted); border: 1px solid rgba(99,102,241,0.2); border-radius: 12px;">
+          <div
+            style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 14px 16px; background: var(--accent-muted); border: 1px solid rgba(99,102,241,0.2); border-radius: 12px;">
             <i data-lucide="tag" style="color: var(--accent); flex-shrink: 0;"></i>
             <span style="font-size: 14px; font-weight: 600; white-space: nowrap;">판매가 일괄 적용</span>
-            <input type="number" id="bulk-selling-price" min="0" placeholder="판매가 입력 후 적용" style="flex: 1; max-width: 200px; padding: 8px 12px; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); font-size: 14px;">
+            <input type="number" id="bulk-selling-price" min="0" placeholder="판매가 입력 후 적용"
+              style="flex: 1; max-width: 200px; padding: 8px 12px; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); font-size: 14px;">
             <button class="btn btn-accent btn-sm" onclick="applyBulkSellingPrice()">
               <i data-lucide="check"></i>
               전체 적용
@@ -1244,9 +1323,18 @@
             </table>
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 12px;">
-            <button class="btn btn-secondary" onclick="closeVerificationCard()">취소</button>
-            <button class="btn btn-accent" onclick="saveAllVerifiedItems()">검증된 품목 일괄 저장</button>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 12px; color: var(--text-muted);">
+              ※ 수정 중인 내역을 '임시 저장' 해두고 나중에 불러올 수 있습니다. (폰에서 촬영 후 PC에서 작업 시 유용)
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary" onclick="saveVerificationDraft()">
+                <i data-lucide="save" style="width:16px; height:16px; color:var(--primary);"></i>
+                <span>임시 저장</span>
+              </button>
+              <button class="btn btn-secondary" onclick="closeVerificationCard()">취소</button>
+              <button class="btn btn-accent" onclick="saveAllVerifiedItems()">검증된 품목 일괄 저장</button>
+            </div>
           </div>
         </div>
 
@@ -1303,7 +1391,8 @@
               <label for="search-input">품목 검색 (초성 지원 / 바코드)</label>
               <div class="input-with-icon">
                 <input type="text" id="search-input" placeholder="이름, 초성(예: ㅁㄹㄴ), 바코드 입력" oninput="renderInventory()">
-                <button type="button" class="input-icon-btn" onclick="openBarcodeScanner('search-input')" title="바코드 스캔">
+                <button type="button" class="input-icon-btn" onclick="openBarcodeScanner('search-input')"
+                  title="바코드 스캔">
                   <i data-lucide="scan-line"></i>
                 </button>
               </div>
@@ -1480,14 +1569,17 @@
               </div>
               <span class="badge badge-success">Gemini 2.5 Flash</span>
             </div>
-            
+
             <div class="form-group" style="margin-bottom: 16px;">
-              <label class="form-label" for="bank-scan-month">대사 대상 월 선택 <span style="color: var(--danger);">*</span></label>
+              <label class="form-label" for="bank-scan-month">대사 대상 월 선택 <span
+                  style="color: var(--danger);">*</span></label>
               <input type="month" id="bank-scan-month" class="form-input">
             </div>
 
             <div class="upload-area" id="bank-dropzone" style="margin-bottom: 16px; height: 130px;">
-              <input type="file" id="bank-input" accept="image/*,application/pdf" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="handleFileSelected(this, 'bank')">
+              <input type="file" id="bank-input" accept="image/*,application/pdf"
+                style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;"
+                onchange="handleFileSelected(this, 'bank')">
               <div class="upload-icon"><i data-lucide="file-text"></i></div>
               <div style="font-size: 13px; font-weight: 600;">통장 거래 내역 사진 업로드</div>
               <div style="font-size: 11px; color: var(--text-muted);">클릭하여 파일 선택 (영업 거래 목록)</div>
@@ -1519,27 +1611,35 @@
                 <i data-lucide="wallet" style="color: var(--accent);"></i>
                 <span>월별 요약 정보</span>
               </div>
-              <select id="finance-summary-month" class="form-input" style="width: auto; padding: 4px 10px; font-size: 12px; height: auto;" onchange="renderFinanceTab()">
+              <select id="finance-summary-month" class="form-input"
+                style="width: auto; padding: 4px 10px; font-size: 12px; height: auto;" onchange="renderFinanceTab()">
                 <!-- Dynamic options like 2026-05 -->
               </select>
             </div>
-            
+
             <div class="grid-3" style="gap: 16px; margin: 16px 0;">
-              <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); padding: 16px; border-radius: 12px; text-align: center;">
+              <div
+                style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); padding: 16px; border-radius: 12px; text-align: center;">
                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">총 수입 (입금)</div>
-                <div id="finance-total-income" style="font-size: 18px; font-weight: 700; color: var(--success);">0원</div>
+                <div id="finance-total-income" style="font-size: 18px; font-weight: 700; color: var(--success);">0원
+                </div>
               </div>
-              <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 16px; border-radius: 12px; text-align: center;">
+              <div
+                style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 16px; border-radius: 12px; text-align: center;">
                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">총 지출 (출금)</div>
-                <div id="finance-total-expense" style="font-size: 18px; font-weight: 700; color: var(--danger);">0원</div>
+                <div id="finance-total-expense" style="font-size: 18px; font-weight: 700; color: var(--danger);">0원
+                </div>
               </div>
-              <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.15); padding: 16px; border-radius: 12px; text-align: center;" id="finance-net-card">
+              <div
+                style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.15); padding: 16px; border-radius: 12px; text-align: center;"
+                id="finance-net-card">
                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">실제 순이익</div>
                 <div id="finance-total-net" style="font-size: 18px; font-weight: 700; color: var(--primary);">0원</div>
               </div>
             </div>
 
-            <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; font-size: 12px;">
+            <div
+              style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; font-size: 12px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                 <span style="color: var(--text-muted);">연간 총 수입:</span>
                 <span id="yearly-total-income" style="font-weight: 600; color: var(--text);">0원</span>
@@ -1565,7 +1665,8 @@
                 <i data-lucide="bar-chart-3" style="color: var(--success);"></i>
                 <span>월별 수입/지출 비교</span>
               </div>
-              <select id="chart-year-filter" class="form-input" style="width: auto; padding: 4px 10px; font-size: 12px; height: auto;" onchange="renderFinanceTab()">
+              <select id="chart-year-filter" class="form-input"
+                style="width: auto; padding: 4px 10px; font-size: 12px; height: auto;" onchange="renderFinanceTab()">
                 <option value="2026">2026년</option>
               </select>
             </div>
@@ -1596,7 +1697,8 @@
               <span>영수증 vs 통장 지출 대사 (누락 감지)</span>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
-              <select id="reconcile-month-filter" class="form-input" style="width: auto; padding: 6px 12px; font-size: 13px;">
+              <select id="reconcile-month-filter" class="form-input"
+                style="width: auto; padding: 6px 12px; font-size: 13px;">
                 <!-- Dynamic months -->
               </select>
               <button class="btn btn-primary" onclick="runReconciliation()">
@@ -1608,19 +1710,23 @@
 
           <!-- Recon Summary stats -->
           <div class="grid-4" style="gap: 16px; margin: 16px 0;" id="recon-stats-row">
-            <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; text-align: center;">
+            <div
+              style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; text-align: center;">
               <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">대상 입고 영수증</div>
               <div id="recon-stat-total" style="font-size: 16px; font-weight: 700;">0건</div>
             </div>
-            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
+            <div
+              style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
               <div style="font-size: 11px; color: var(--success); margin-bottom: 2px;">✅ 매칭 완료</div>
               <div id="recon-stat-matched" style="font-size: 16px; font-weight: 700; color: var(--success);">0건</div>
             </div>
-            <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
+            <div
+              style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
               <div style="font-size: 11px; color: var(--primary); margin-bottom: 2px;">⚠️ 금액 불일치</div>
               <div id="recon-stat-diff" style="font-size: 16px; font-weight: 700; color: var(--primary);">0건</div>
             </div>
-            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
+            <div
+              style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); padding: 12px; border-radius: 8px; text-align: center;">
               <div style="font-size: 11px; color: var(--danger); margin-bottom: 2px;">❌ 통장 누락</div>
               <div id="recon-stat-unmatched" style="font-size: 16px; font-weight: 700; color: var(--danger);">0건</div>
             </div>
@@ -1644,7 +1750,8 @@
               </thead>
               <tbody id="reconciliation-tbody">
                 <tr>
-                  <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 20px;">[대사 실행] 버튼을 눌러 분석을 시작하세요.</td>
+                  <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 20px;">[대사 실행] 버튼을 눌러
+                    분석을 시작하세요.</td>
                 </tr>
               </tbody>
             </table>
@@ -1675,14 +1782,16 @@
               </div>
               <p class="section-desc" style="margin-bottom: 20px;">
                 무료 구글 AI를 활용한 영수증 판독 기능 작동을 위한 API 키를 입력하세요. <br>
-                API 키는 <a href="https://aistudio.google.com" target="_blank" style="color: var(--primary); font-weight:700;">AI Studio</a>에서 구글 로그인 후 발급받을 수 있습니다.
+                API 키는 <a href="https://aistudio.google.com" target="_blank"
+                  style="color: var(--primary); font-weight:700;">AI Studio</a>에서 구글 로그인 후 발급받을 수 있습니다.
               </p>
 
               <div class="form-group">
                 <label for="gemini-key-input">Gemini API Key</label>
                 <div class="input-with-icon">
                   <input type="password" id="gemini-key-input" placeholder="AI Studio에서 발급받은 API 키 입력">
-                  <button type="button" class="input-icon-btn" onclick="togglePasswordVisibility('gemini-key-input')" title="비밀번호 보기/숨기기">
+                  <button type="button" class="input-icon-btn" onclick="togglePasswordVisibility('gemini-key-input')"
+                    title="비밀번호 보기/숨기기">
                     <i data-lucide="eye" id="gemini-key-eye"></i>
                   </button>
                 </div>
@@ -1719,7 +1828,8 @@
             </p>
 
             <div style="display: flex; flex-direction: column; gap: 12px;">
-              <button class="btn btn-secondary" style="justify-content: flex-start; text-align: left;" onclick="exportDataBackup()">
+              <button class="btn btn-secondary" style="justify-content: flex-start; text-align: left;"
+                onclick="exportDataBackup()">
                 <i data-lucide="upload-cloud"></i>
                 <div>
                   <div style="font-weight: 700; font-size:14px;">데이터 JSON 파일 내보내기 (백업)</div>
@@ -1727,13 +1837,18 @@
                 </div>
               </button>
 
-              <div class="upload-area" id="restore-dropzone" style="padding: 16px; border-style: solid; border-width: 1px;">
-                <input type="file" id="restore-file-input" accept=".json" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;" onchange="importDataBackup(this)">
+              <div class="upload-area" id="restore-dropzone"
+                style="padding: 16px; border-style: solid; border-width: 1px;">
+                <input type="file" id="restore-file-input" accept=".json"
+                  style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1;"
+                  onchange="importDataBackup(this)">
                 <div style="display:flex; align-items:center; gap:12px; width:100%; text-align:left;">
-                  <div class="upload-icon" style="width:36px; height:36px;"><i data-lucide="download-cloud" style="width:18px; height:18px;"></i></div>
+                  <div class="upload-icon" style="width:36px; height:36px;"><i data-lucide="download-cloud"
+                      style="width:18px; height:18px;"></i></div>
                   <div>
                     <div style="font-weight: 700; font-size:14px;">데이터 백업 복원하기 (가져오기)</div>
-                    <div style="font-weight: 400; font-size:12px; color: var(--text-muted);">기존 데이터를 백업 JSON 파일로 덮어씌웁니다.</div>
+                    <div style="font-weight: 400; font-size:12px; color: var(--text-muted);">기존 데이터를 백업 JSON 파일로 덮어씌웁니다.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1790,7 +1905,8 @@
             <div style="margin-bottom: 16px;">
               <form id="add-category-form" onsubmit="handleAddCategory(event)" style="display:flex; gap:8px;">
                 <input type="text" id="new-category-name" required placeholder="새 카테고리 이름" style="flex:1;">
-                <input type="color" id="new-category-color" value="#3b82f6" style="width:48px; padding:0; cursor:pointer;" title="카테고리 태그 색상">
+                <input type="color" id="new-category-color" value="#3b82f6"
+                  style="width:48px; padding:0; cursor:pointer;" title="카테고리 태그 색상">
                 <button type="submit" class="btn btn-accent btn-sm">추가</button>
               </form>
             </div>
@@ -1819,7 +1935,8 @@
 
   <!-- Mobile Bottom Nav -->
   <nav class="mobile-nav">
-    <a href="javascript:void(0)" class="mobile-nav-item active" onclick="switchTab('stock-entry-tab', this); return false;">
+    <a href="javascript:void(0)" class="mobile-nav-item active"
+      onclick="switchTab('stock-entry-tab', this); return false;">
       <i data-lucide="package-plus"></i>
       <span>입고 등록</span>
     </a>
@@ -1851,7 +1968,8 @@
           <i data-lucide="scan"></i>
           <span>카메라 바코드 스캐너</span>
         </h3>
-        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBarcodeScanner()"><i data-lucide="x"></i></button>
+        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBarcodeScanner()"><i
+            data-lucide="x"></i></button>
       </div>
       <div class="modal-body" style="text-align: center;">
         <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
@@ -1880,7 +1998,8 @@
           <i data-lucide="edit-3" style="color:var(--accent);"></i>
           <span>입고 정보 수정</span>
         </h3>
-        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeEditModal()"><i data-lucide="x"></i></button>
+        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeEditModal()"><i
+            data-lucide="x"></i></button>
       </div>
       <form id="edit-batch-form" onsubmit="handleEditBatchSubmit(event)">
         <div class="modal-body">
@@ -1914,11 +2033,13 @@
             </div>
             <div class="form-group">
               <label for="edit-purchase-price">매입 단가 (원)</label>
-              <input type="number" id="edit-purchase-price" required min="0" oninput="calculateProfitMargin('edit')" placeholder="예: 500">
+              <input type="number" id="edit-purchase-price" required min="0" oninput="calculateProfitMargin('edit')"
+                placeholder="예: 500">
             </div>
             <div class="form-group">
               <label for="edit-selling-price">소비자가 (원)</label>
-              <input type="number" id="edit-selling-price" required min="0" oninput="calculateProfitMargin('edit')" placeholder="예: 1000">
+              <input type="number" id="edit-selling-price" required min="0" oninput="calculateProfitMargin('edit')"
+                placeholder="예: 1000">
             </div>
           </div>
           <div class="grid-2">
@@ -1928,7 +2049,8 @@
             </div>
             <div class="form-group">
               <label>수익률 / 마진</label>
-              <div id="edit-profit-display" style="padding: 10px 0; font-size: 16px; font-weight: 800; color: var(--success);">
+              <div id="edit-profit-display"
+                style="padding: 10px 0; font-size: 16px; font-weight: 800; color: var(--success);">
                 0.0%
               </div>
             </div>
@@ -1956,7 +2078,8 @@
           <i data-lucide="edit-3" style="color:var(--primary);"></i>
           <span id="bank-editor-title">통장 거래 내역 검토 및 수정</span>
         </h3>
-        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBankEditorModal()"><i data-lucide="x"></i></button>
+        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBankEditorModal()"><i
+            data-lucide="x"></i></button>
       </div>
       <div class="modal-body">
         <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
@@ -2006,7 +2129,8 @@
           <i data-lucide="file-text" style="color:var(--accent);"></i>
           <span id="bank-details-title">통장 거래 상세 내역</span>
         </h3>
-        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBankDetailsModal()"><i data-lucide="x"></i></button>
+        <button class="btn btn-secondary btn-icon-only btn-sm" onclick="closeBankDetailsModal()"><i
+            data-lucide="x"></i></button>
       </div>
       <div class="modal-body">
         <div class="table-wrapper" style="max-height: 350px; overflow-y: auto;">
@@ -2047,6 +2171,7 @@
       suppliers: [],
       categories: [],
       bank_records: [],
+      draft_buffer: [],
       settings: {
         gemini_api_key: '',
         alert_threshold: 7
@@ -2067,6 +2192,7 @@
       const storedCategories = localStorage.getItem('funny_categories');
       const storedSettings = localStorage.getItem('funny_settings');
       const storedBankRecords = localStorage.getItem('funny_bank_records');
+      const storedDraftBuffer = localStorage.getItem('funny_draft_buffer');
 
       if (storedProducts && storedStockIn && storedInventory && storedSuppliers && storedCategories && storedSettings) {
         state.products = JSON.parse(storedProducts);
@@ -2076,6 +2202,7 @@
         state.categories = JSON.parse(storedCategories);
         state.settings = JSON.parse(storedSettings);
         state.bank_records = storedBankRecords ? JSON.parse(storedBankRecords) : [];
+        state.draft_buffer = storedDraftBuffer ? JSON.parse(storedDraftBuffer) : [];
       } else {
         // Load premium sample mock data for first impressions!
         const todayStr = getTodayString();
@@ -2229,6 +2356,7 @@
       renderRecentStockIns();
       renderFavoritesList();
       updateDashboardAnalytics();
+      checkDraftStatus();
     }
 
     function saveStateToLocalStorage() {
@@ -2239,6 +2367,7 @@
       localStorage.setItem('funny_categories', JSON.stringify(state.categories));
       localStorage.setItem('funny_settings', JSON.stringify(state.settings));
       localStorage.setItem('funny_bank_records', JSON.stringify(state.bank_records));
+      localStorage.setItem('funny_draft_buffer', JSON.stringify(state.draft_buffer || []));
     }
 
     // Helper: format today's date YYYY-MM-DD
@@ -2261,7 +2390,7 @@
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
-      
+
       let icon = 'info';
       if (type === 'success') icon = 'check-circle-2';
       if (type === 'danger') icon = 'alert-triangle';
@@ -2271,7 +2400,7 @@
         <i data-lucide="${icon}"></i>
         <div>${message}</div>
       `;
-      
+
       container.appendChild(toast);
       lucide.createIcons();
 
@@ -2292,13 +2421,13 @@
       const htmlEl = document.documentElement;
       const currentTheme = htmlEl.getAttribute('theme');
       const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      
+
       htmlEl.setAttribute('theme', nextTheme);
       localStorage.setItem('funny_theme', nextTheme);
-      
+
       updateThemeIcons(nextTheme);
       showToast(`${nextTheme === 'dark' ? '다크' : '라이트'} 모드로 전환되었습니다.`);
-      
+
       // Redraw charts since text colors need to match theme
       if (charts.popular) updateCharts();
     }
@@ -2307,7 +2436,7 @@
       const sidebarIcon = document.getElementById('sidebar-theme-icon');
       const mobileIcon = document.getElementById('mobile-theme-icon');
       const iconName = theme === 'dark' ? 'sun' : 'moon';
-      
+
       sidebarIcon.setAttribute('data-lucide', iconName);
       mobileIcon.setAttribute('data-lucide', iconName);
       lucide.createIcons();
@@ -2366,7 +2495,7 @@
       const storedTheme = localStorage.getItem('funny_theme') || 'dark';
       document.documentElement.setAttribute('theme', storedTheme);
       updateThemeIcons(storedTheme);
-      
+
       initAppDatabase();
       initDragAndDrop();
       document.getElementById('stock-expiry-date').value = '';
@@ -2398,7 +2527,7 @@
 
       // Find indices or match elements
       el.classList.add('active');
-      
+
       // Match active in the other menu (desktop vs mobile sync)
       const tabName = tabId.replace('-tab', '');
       document.querySelectorAll(`.nav-item, .mobile-nav-item`).forEach(item => {
@@ -2433,7 +2562,7 @@
       // Stock Entry Suppliers
       const supplierSelect = document.getElementById('stock-supplier');
       const filterSupplier = document.getElementById('filter-supplier');
-      
+
       supplierSelect.innerHTML = '';
       filterSupplier.innerHTML = '<option value="all">전체 납품처</option>';
 
@@ -2523,7 +2652,7 @@
 
       const rate = ((price - cost) / cost) * 100;
       display.textContent = `${rate.toFixed(1)}%`;
-      
+
       if (rate >= 60) {
         display.style.color = 'var(--success)';
       } else if (rate >= 20) {
@@ -2552,7 +2681,7 @@
       }
 
       html5QrcodeScanner = new Html5Qrcode("barcode-reader");
-      
+
       const config = { fps: 10, qrbox: { width: 250, height: 120 } };
 
       html5QrcodeScanner.start(
@@ -2587,7 +2716,7 @@
       const inputEl = document.getElementById(barcodeTargetInputId);
       if (inputEl) {
         inputEl.value = decodedText;
-        
+
         // Trigger barcode product lookup if it is the Stock entry form
         if (barcodeTargetInputId === 'stock-barcode') {
           lookupProductByBarcode(decodedText);
@@ -2628,7 +2757,7 @@
     // ==========================================
     function handleManualStockSubmit(event) {
       event.preventDefault();
-      
+
       const supplierId = document.getElementById('stock-supplier').value;
       const category = document.getElementById('stock-category').value;
       const barcode = document.getElementById('stock-barcode').value.trim();
@@ -2646,7 +2775,7 @@
 
       // Check if product with this name exists, otherwise create
       let product = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
-      
+
       if (!product) {
         product = {
           id: generateId('prod'),
@@ -2682,7 +2811,7 @@
 
       // Update or Add to current inventory
       const profitRate = purchasePrice > 0 ? parseFloat(((sellingPrice - purchasePrice) / purchasePrice * 100).toFixed(1)) : (sellingPrice > 0 ? 100 : 0);
-      
+
       let invItem = state.inventory.find(inv => inv.product_id === product.id && inv.expiry_date === expiryDate);
       if (invItem) {
         invItem.current_qty += qty;
@@ -2698,7 +2827,7 @@
 
       saveStateToLocalStorage();
       showToast(`품목 [${name}] 재고 ${qty}개가 저장되었습니다.`, 'success');
-      
+
       // UI resets and updates
       resetManualForm();
       renderRecentStockIns();
@@ -2723,7 +2852,7 @@
       tbody.innerHTML = '';
 
       // Sort by date or ID desc (latest first)
-      const sortedIn = [...state.stock_in].sort((a,b) => b.id.localeCompare(a.id)).slice(0, 5);
+      const sortedIn = [...state.stock_in].sort((a, b) => b.id.localeCompare(a.id)).slice(0, 5);
 
       if (sortedIn.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">최근 입고 내역이 없습니다.</td></tr>`;
@@ -2733,7 +2862,7 @@
       sortedIn.forEach(rec => {
         const prod = state.products.find(p => p.id === rec.product_id) || { name: '알 수 없는 상품', category: '기타' };
         const supplier = state.suppliers.find(s => s.id === (prod.supplier_id || '')) || { name: '일반 납품처' };
-        
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${rec.date}</td>
@@ -2784,7 +2913,7 @@
 
       const preview = document.getElementById(`${type}-preview`);
       const dropzone = document.getElementById(`${type}-dropzone`);
-      
+
       const isPdf = file.type === 'application/pdf';
       const icon = dropzone.querySelector('.upload-icon');
       const text2 = dropzone.querySelector('div:nth-of-type(2)');
@@ -2796,15 +2925,15 @@
           preview.style.display = 'none';
         }
         icon.style.display = 'none';
-        
+
         // Show PDF tag and filename
         text2.innerHTML = `<i data-lucide="file-text" style="display:inline-block; width:16px; height:16px; color:#ef4444; vertical-align:middle; margin-right:4px;"></i><span style="font-weight:700; color:#ef4444;">PDF</span> ${file.name}`;
         text2.style.color = 'var(--text)';
         text2.style.display = 'block';
-        
+
         text3.innerHTML = '클릭 또는 드롭하여 파일 변경';
         text3.style.display = 'block';
-        
+
         lucide.createIcons();
 
         let typeLabel = '';
@@ -2821,13 +2950,13 @@
             preview.style.display = 'block';
           }
           icon.style.display = 'none';
-          
+
           text2.innerHTML = file.name;
           text2.style.color = 'transparent';
           text2.style.display = 'none';
-          
+
           text3.style.display = 'none';
-          
+
           let typeLabel = '';
           if (type === 'receipt') typeLabel = '영수증';
           else if (type === 'label') typeLabel = '유통기한 라벨';
@@ -2861,7 +2990,7 @@
 
         // Convert file to base64
         const fileReader = new FileReader();
-        
+
         const fileAsBase64 = await new Promise((resolve, reject) => {
           fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
           fileReader.onerror = (e) => reject(e);
@@ -2934,7 +3063,7 @@ JSON 응답 형식:
 
         const data = await response.json();
         let jsonStr = data.candidates[0].content.parts[0].text;
-        
+
         // Clean markdown backticks if returned in text fallback
         jsonStr = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
         const result = JSON.parse(jsonStr);
@@ -2967,7 +3096,7 @@ JSON 응답 형식:
         const name = item.name || '';
         const qty = item.quantity || 1;
         const purchase = item.purchase_price || 500;
-        
+
         // Look up if product already exists to guess category & selling price & supplier
         const existingProd = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
         const defaultCatSelect = document.getElementById('ai-default-category');
@@ -2995,7 +3124,7 @@ JSON 응답 형식:
         // Render HTML row
         const tr = document.createElement('tr');
         tr.id = `verification-row-${index}`;
-        
+
         // Create supplier options
         let supplierOptions = '';
         state.suppliers.forEach(s => {
@@ -3101,6 +3230,59 @@ JSON 응답 형식:
       }
     }
 
+    function saveVerificationDraft() {
+      if (!aiExtractedBuffer || aiExtractedBuffer.length === 0) {
+        showToast('임시 저장할 내역이 없습니다.', 'warning');
+        return;
+      }
+      state.draft_buffer = [...aiExtractedBuffer];
+      saveStateToLocalStorage();
+      showToast(`분석 내역 ${state.draft_buffer.length}건이 임시 저장되었습니다. 다른 기기(PC 등)에서 불러올 수 있습니다.`, 'success');
+      checkDraftStatus();
+    }
+
+    function loadDraftToVerification() {
+      if (!state.draft_buffer || state.draft_buffer.length === 0) {
+        showToast('임시 저장된 내역이 없습니다.', 'warning');
+        return;
+      }
+      // Re-populate verification card with draft contents
+      showToast('임시 저장된 분석 내역을 불러왔습니다.', 'success');
+      showVerificationCard(state.draft_buffer);
+      // Synchronize aiExtractedBuffer values to ensure fields loaded from saved state are correct
+      aiExtractedBuffer = [...state.draft_buffer];
+
+      // Update DOM values to match the restored buffer state
+      aiExtractedBuffer.forEach(item => {
+        const row = document.getElementById(`verification-row-${item.tempId}`);
+        if (row) {
+          const inputs = row.querySelectorAll('input');
+          const selects = row.querySelectorAll('select');
+
+          if (selects[0]) selects[0].value = item.supplier_id;
+          if (selects[1]) selects[1].value = item.category;
+          if (inputs[0]) inputs[0].value = item.name;
+          if (inputs[1]) inputs[1].value = item.quantity;
+          if (inputs[2]) inputs[2].value = item.purchase_price;
+          if (inputs[3]) inputs[3].value = item.selling_price || '';
+          if (inputs[4]) inputs[4].value = item.expiry_date || '';
+
+          recalcRowProfit(item.tempId);
+        }
+      });
+    }
+
+    function checkDraftStatus() {
+      const btn = document.getElementById('btn-load-draft');
+      if (btn) {
+        if (state.draft_buffer && state.draft_buffer.length > 0) {
+          btn.style.display = 'inline-flex';
+        } else {
+          btn.style.display = 'none';
+        }
+      }
+    }
+
     function closeVerificationCard() {
       document.getElementById('ai-verification-card').style.display = 'none';
       aiExtractedBuffer = [];
@@ -3147,7 +3329,7 @@ JSON 응답 형식:
         // 3. Add to inventory
         const profitRate = item.purchase_price > 0 ? parseFloat(((item.selling_price - item.purchase_price) / item.purchase_price * 100).toFixed(1)) : (item.selling_price > 0 ? 100 : 0);
         let invItem = state.inventory.find(inv => inv.product_id === product.id && inv.expiry_date === item.expiry_date);
-        
+
         if (invItem) {
           invItem.current_qty += item.quantity;
           invItem.profit_rate = profitRate;
@@ -3163,8 +3345,9 @@ JSON 응답 형식:
 
       saveStateToLocalStorage();
       showToast(`총 ${aiExtractedBuffer.length}개 품목이 재고에 추가되었습니다.`, 'success');
-      
+
       closeVerificationCard();
+      checkDraftStatus();
       renderRecentStockIns();
       renderFavoritesList();
       updateDashboardAnalytics();
@@ -3178,7 +3361,7 @@ JSON 응답 형식:
 
     // Simple Korean Consonant Matcher
     function getChoSung(str) {
-      const cho = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+      const cho = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
       let result = "";
       for (let i = 0; i < str.length; i++) {
         const code = str.charCodeAt(i) - 44032;
@@ -3196,7 +3379,7 @@ JSON 응답 형식:
       const query = document.getElementById('search-input').value.trim().toLowerCase();
       const supplierFilter = document.getElementById('filter-supplier').value;
       const sortVal = document.getElementById('sort-select').value;
-      
+
       const grid = document.getElementById('inventory-grid-container');
       grid.innerHTML = '';
 
@@ -3205,17 +3388,17 @@ JSON 응답 형식:
 
       // Check D-days
       const today = new Date();
-      today.setHours(0,0,0,0);
+      today.setHours(0, 0, 0, 0);
       const warnDays = state.settings.alert_threshold || 7;
 
       let filteredInv = state.inventory.map(inv => {
         const prod = state.products.find(p => p.id === inv.product_id);
         const supplier = state.suppliers.find(s => s.id === (prod?.supplier_id || ''));
-        
+
         // Calculate D-day
         const expiry = new Date(inv.expiry_date);
         const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-        
+
         return {
           ...inv,
           prodName: prod ? prod.name : '알 수 없는 상품',
@@ -3287,13 +3470,13 @@ JSON 응답 형식:
       filteredInv.forEach(item => {
         const card = document.createElement('div');
         card.className = 'inventory-card';
-        
+
         // Define badge color by D-day or Status
         let badgeClass = 'badge-success';
         let badgeText = `D-${item.dday}`;
-        
+
         const isArchived = item.current_qty === 0 || item.status === 'sold_out' || item.status === 'discarded';
-        
+
         if (item.status === 'sold_out') {
           badgeClass = 'badge-success';
           badgeText = '소진 완료';
@@ -3444,7 +3627,7 @@ JSON 응답 형식:
         state.stock_in = state.stock_in.filter(s => !(s.product_id === prodId && s.expiry_date === expiryDate));
         // Delete from inventory
         state.inventory = state.inventory.filter(i => !(i.product_id === prodId && i.expiry_date === expiryDate));
-        
+
         saveStateToLocalStorage();
         showToast(`[${prodName}] 입고 데이터가 삭제되었습니다.`, 'danger');
         renderInventory();
@@ -3458,7 +3641,7 @@ JSON 응답 형식:
 
     function openEditModal(prodId, expiryDate) {
       activeEditItem = { prodId, expiryDate };
-      
+
       const prod = state.products.find(p => p.id === prodId);
       const inv = state.inventory.find(i => i.product_id === prodId && i.expiry_date === expiryDate);
       const stockIn = state.stock_in.find(s => s.product_id === prodId && s.expiry_date === expiryDate);
@@ -3498,7 +3681,7 @@ JSON 응답 형식:
       calculateProfitMargin('edit');
 
       document.getElementById('edit-modal').classList.add('show');
-      
+
       // Initialize icons in the modal if any
       lucide.createIcons();
     }
@@ -3551,7 +3734,7 @@ JSON 응답 형식:
       // Update inventory record
       const profitRate = purchasePrice > 0 ? parseFloat(((sellingPrice - purchasePrice) / purchasePrice * 100).toFixed(1)) : (sellingPrice > 0 ? 100 : 0);
       const inv = state.inventory.find(i => i.product_id === prodId && i.expiry_date === oldExpiryDate);
-      
+
       if (inv) {
         inv.expiry_date = newExpiryDate;
         inv.profit_rate = profitRate;
@@ -3564,7 +3747,7 @@ JSON 응답 형식:
 
       saveStateToLocalStorage();
       showToast('입고 정보가 성공적으로 수정되었습니다.', 'success');
-      
+
       closeEditModal();
       renderInventory();
       updateDashboardAnalytics();
@@ -3649,7 +3832,7 @@ JSON 응답 형식:
             // Find purchase price from latest stock in or historical stock-in
             const matchingStockIn = state.stock_in.filter(s => s.product_id === inv.product_id && s.expiry_date === inv.expiry_date);
             const purchasePrice = matchingStockIn.length > 0 ? matchingStockIn[0].purchase_price : (prod.selling_price / 1.5);
-            
+
             totalAssetValue += (purchasePrice * inv.current_qty);
             totalRevenueValue += (prod.selling_price * inv.current_qty);
           }
@@ -3677,7 +3860,7 @@ JSON 응답 형식:
 
       // --- CHART 1: POPULAR ITEMS (ORDER FREQUENCY) ---
       const popularCtx = document.getElementById('popular-chart').getContext('2d');
-      
+
       // Calculate frequency of stock ins per product
       const freq = {};
       state.stock_in.forEach(rec => {
@@ -3689,7 +3872,7 @@ JSON 응답 형식:
           const prod = state.products.find(p => p.id === id);
           return { name: prod ? prod.name : '알 수 없음', count };
         })
-        .sort((a,b) => b.count - a.count)
+        .sort((a, b) => b.count - a.count)
         .slice(0, 8);
 
       if (charts.popular) charts.popular.destroy();
@@ -3722,7 +3905,7 @@ JSON 응답 형식:
       // --- CHART 2: CATEGORY INVENTORY DOUGHNUT ---
       const categoryCtx = document.getElementById('category-chart').getContext('2d');
       const catDistribution = {};
-      
+
       state.categories.forEach(c => {
         catDistribution[c.name] = { qty: 0, color: c.color };
       });
@@ -3778,7 +3961,7 @@ JSON 응답 형식:
           if (prod && categoryProfits[prod.category]) {
             const matchingStockIn = state.stock_in.filter(s => s.product_id === inv.product_id && s.expiry_date === inv.expiry_date);
             const purchasePrice = matchingStockIn.length > 0 ? matchingStockIn[0].purchase_price : (prod.selling_price / 1.5);
-            
+
             categoryProfits[prod.category].totalCost += (purchasePrice * inv.current_qty);
             categoryProfits[prod.category].totalSales += (prod.selling_price * inv.current_qty);
           }
@@ -3829,13 +4012,13 @@ JSON 응답 형식:
         const stockIns = state.stock_in
           .filter(s => s.product_id === prod.id)
           .map(s => new Date(s.date))
-          .sort((a,b) => a - b);
+          .sort((a, b) => a - b);
 
         let averageDays = 'N/A';
         if (stockIns.length > 1) {
           let diffSum = 0;
           for (let i = 1; i < stockIns.length; i++) {
-            diffSum += (stockIns[i] - stockIns[i-1]) / (1000 * 60 * 60 * 24);
+            diffSum += (stockIns[i] - stockIns[i - 1]) / (1000 * 60 * 60 * 24);
           }
           averageDays = `${Math.round(diffSum / (stockIns.length - 1))}일`;
         }
@@ -3843,7 +4026,7 @@ JSON 응답 형식:
         // Get latest restock date
         const latestRec = state.stock_in
           .filter(s => s.product_id === prod.id)
-          .sort((a,b) => b.date.localeCompare(a.date))[0];
+          .sort((a, b) => b.date.localeCompare(a.date))[0];
 
         const latestDate = latestRec ? latestRec.date : '-';
 
@@ -3875,7 +4058,7 @@ JSON 응답 형식:
       });
 
       // Filter or sort restockData to show critical ones first
-      restockData.sort((a,b) => a.qty - b.qty);
+      restockData.sort((a, b) => a.qty - b.qty);
 
       restockData.forEach(item => {
         const tr = document.createElement('tr');
@@ -3917,10 +4100,10 @@ JSON 응답 형식:
           document.getElementById('stock-selling-price').value = prod.selling_price;
           document.getElementById('stock-barcode').value = prod.barcode || '';
           document.getElementById('stock-note').value = prod.note || '';
-          
+
           calculateProfitMargin('manual');
           showToast(`[${prod.name}] 정보가 직접 입력 폼에 채워졌습니다.`, 'success');
-          
+
           // Scroll form into view
           document.getElementById('manual-stock-form').scrollIntoView({ behavior: 'smooth' });
         };
@@ -3941,7 +4124,7 @@ JSON 응답 형식:
     function togglePasswordVisibility(inputId) {
       const input = document.getElementById(inputId);
       const eyeIcon = document.getElementById('gemini-key-eye');
-      
+
       if (input.type === 'password') {
         input.type = 'text';
         eyeIcon.setAttribute('data-lucide', 'eye-off');
@@ -4011,7 +4194,7 @@ JSON 응답 형식:
       const today = new Date();
       const currentMonthStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
       monthsSet.add(currentMonthStr);
-      
+
       state.bank_records.forEach(r => {
         monthsSet.add(`${r.year}-${String(r.month).padStart(2, '0')}`);
       });
@@ -4020,17 +4203,17 @@ JSON 응답 형식:
           monthsSet.add(s.date.substring(0, 7));
         }
       });
-      
+
       const sortedMonths = Array.from(monthsSet).sort().reverse();
-      
+
       const summarySelect = document.getElementById('finance-summary-month');
       const reconcileSelect = document.getElementById('reconcile-month-filter');
       const oldSummaryVal = summarySelect.value;
       const oldReconVal = reconcileSelect.value;
-      
-      summarySelect.innerHTML = sortedMonths.map(m => `<option value="${m}">${m.substring(0,4)}년 ${m.substring(5,7)}월</option>`).join('');
-      reconcileSelect.innerHTML = sortedMonths.map(m => `<option value="${m}">${m.substring(0,4)}년 ${m.substring(5,7)}월</option>`).join('');
-      
+
+      summarySelect.innerHTML = sortedMonths.map(m => `<option value="${m}">${m.substring(0, 4)}년 ${m.substring(5, 7)}월</option>`).join('');
+      reconcileSelect.innerHTML = sortedMonths.map(m => `<option value="${m}">${m.substring(0, 4)}년 ${m.substring(5, 7)}월</option>`).join('');
+
       if (oldSummaryVal && sortedMonths.includes(oldSummaryVal)) {
         summarySelect.value = oldSummaryVal;
       } else {
@@ -4052,17 +4235,17 @@ JSON 응답 형식:
       const selectedMonthStr = summarySelect.value;
       const [selYear, selMonth] = selectedMonthStr.split('-').map(Number);
       const record = state.bank_records.find(r => r.year === selYear && r.month === selMonth);
-      
+
       const incEl = document.getElementById('finance-total-income');
       const expEl = document.getElementById('finance-total-expense');
       const netEl = document.getElementById('finance-total-net');
       const netCard = document.getElementById('finance-net-card');
-      
+
       if (record) {
         incEl.textContent = `₩${record.total_income.toLocaleString()}`;
         expEl.textContent = `₩${record.total_expense.toLocaleString()}`;
         netEl.textContent = `${record.net_profit >= 0 ? '+' : ''}₩${record.net_profit.toLocaleString()}`;
-        
+
         // Style card based on positive/negative net profit
         if (record.net_profit > 0) {
           netCard.style.background = 'rgba(16, 185, 129, 0.08)';
@@ -4091,7 +4274,7 @@ JSON 응답 형식:
       const yIncome = yearRecords.reduce((sum, r) => sum + r.total_income, 0);
       const yExpense = yearRecords.reduce((sum, r) => sum + r.total_expense, 0);
       const yNet = yIncome - yExpense;
-      
+
       document.getElementById('yearly-total-income').textContent = `₩${yIncome.toLocaleString()}`;
       document.getElementById('yearly-total-expense').textContent = `₩${yExpense.toLocaleString()}`;
       const accumNetEl = document.getElementById('yearly-accum-net');
@@ -4102,7 +4285,7 @@ JSON 응답 형식:
       const yearFilter = document.getElementById('chart-year-filter');
       const uniqueYears = Array.from(new Set(state.bank_records.map(r => r.year)));
       if (uniqueYears.length === 0) uniqueYears.push(today.getFullYear());
-      
+
       const oldYearVal = yearFilter.value;
       yearFilter.innerHTML = uniqueYears.sort().map(y => `<option value="${y}">${y}년</option>`).join('');
       if (uniqueYears.includes(Number(oldYearVal))) {
@@ -4113,7 +4296,7 @@ JSON 응답 형식:
 
       // 5. Initialize/Redraw Charts
       initFinanceCharts();
-      
+
       lucide.createIcons();
     }
 
@@ -4174,7 +4357,7 @@ JSON 응답 형식:
             },
             tooltip: {
               callbacks: {
-                label: function(context) {
+                label: function (context) {
                   return `${context.dataset.label}: ₩${context.raw.toLocaleString()}`;
                 }
               }
@@ -4182,7 +4365,7 @@ JSON 응답 형식:
           },
           scales: {
             x: { grid: { display: false }, ticks: { color: textCol, font: { family: 'Outfit' } } },
-            y: { grid: { color: gridCol }, ticks: { color: textCol, font: { family: 'Outfit' }, callback: val => `₩${(val/10000).toLocaleString()}만` } }
+            y: { grid: { color: gridCol }, ticks: { color: textCol, font: { family: 'Outfit' }, callback: val => `₩${(val / 10000).toLocaleString()}만` } }
           },
           onClick: (evt, activeElements) => {
             if (activeElements.length > 0) {
@@ -4225,7 +4408,7 @@ JSON 응답 형식:
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: function(context) {
+                label: function (context) {
                   return `순이익: ₩${context.raw.toLocaleString()}`;
                 }
               }
@@ -4233,9 +4416,9 @@ JSON 응답 형식:
           },
           scales: {
             x: { grid: { display: false }, ticks: { color: textCol, font: { family: 'Outfit' } } },
-            y: { 
-              grid: { color: gridCol }, 
-              ticks: { color: textCol, font: { family: 'Outfit' }, callback: val => `₩${(val/10000).toLocaleString()}만` } 
+            y: {
+              grid: { color: gridCol },
+              ticks: { color: textCol, font: { family: 'Outfit' }, callback: val => `₩${(val / 10000).toLocaleString()}만` }
             }
           }
         }
@@ -4246,10 +4429,10 @@ JSON 응답 형식:
       const record = state.bank_records.find(r => r.year === year && r.month === month);
       const titleEl = document.getElementById('bank-details-title');
       const tbody = document.getElementById('bank-details-tbody');
-      
+
       titleEl.textContent = `${year}년 ${month}월 통장 거래 상세 내역`;
       tbody.innerHTML = '';
-      
+
       if (!record || !record.transactions || record.transactions.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">해당 월의 기록된 거래 내역이 없습니다.</td></tr>`;
       } else {
@@ -4260,16 +4443,16 @@ JSON 응답 형식:
           rent: '임대료 (지출)',
           other: '기타'
         };
-        
+
         record.transactions.forEach(tx => {
-          const typeBadge = tx.type === 'income' 
-            ? `<span class="badge badge-success">입금</span>` 
+          const typeBadge = tx.type === 'income'
+            ? `<span class="badge badge-success">입금</span>`
             : `<span class="badge badge-danger">출금</span>`;
-            
+
           const amountText = tx.type === 'income'
             ? `<span style="color: var(--success); font-weight: 700;">+₩${tx.amount.toLocaleString()}</span>`
             : `<span style="color: var(--danger); font-weight: 700;">-₩${tx.amount.toLocaleString()}</span>`;
-            
+
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${tx.date}</td>
@@ -4281,7 +4464,7 @@ JSON 응답 형식:
           tbody.appendChild(tr);
         });
       }
-      
+
       document.getElementById('bank-details-modal').classList.add('show');
       lucide.createIcons();
     }
@@ -4395,10 +4578,10 @@ JSON 응답 형식:
         if (result && result.transactions && result.transactions.length > 0) {
           showToast(`AI가 통장에서 ${result.transactions.length}개의 거래를 판독했습니다! 검토를 진행하세요.`, 'success');
           bankEditorBuffer = result.transactions;
-          
+
           document.getElementById('bank-editor-month-label').textContent = scanMonthVal;
           document.getElementById('bank-editor-title').textContent = '통장 거래 내역 검토 및 수정 (AI 판독)';
-          
+
           renderBankEditorTable();
           document.getElementById('bank-editor-modal').classList.add('show');
         } else {
@@ -4442,7 +4625,7 @@ JSON 응답 형식:
     function resetReceiptDropzones() {
       loadedFiles.receipt = null;
       loadedFiles.label = null;
-      
+
       const rPreview = document.getElementById('receipt-preview');
       if (rPreview) {
         rPreview.src = '';
@@ -4453,7 +4636,7 @@ JSON 응답 형식:
         lPreview.src = '';
         lPreview.style.display = 'none';
       }
-      
+
       const rDropzone = document.getElementById('receipt-dropzone');
       if (rDropzone) {
         const icon = rDropzone.querySelector('.upload-icon');
@@ -4470,7 +4653,7 @@ JSON 응답 형식:
           t3.textContent = '클릭하여 파일 선택';
         }
       }
-      
+
       const lDropzone = document.getElementById('label-dropzone');
       if (lDropzone) {
         const icon = lDropzone.querySelector('.upload-icon');
@@ -4487,7 +4670,7 @@ JSON 응답 형식:
           t3.textContent = '클릭하여 파일 선택';
         }
       }
-      
+
       document.getElementById('receipt-input').value = '';
       document.getElementById('label-input').value = '';
     }
@@ -4500,17 +4683,17 @@ JSON 응답 형식:
         monthVal = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
         document.getElementById('bank-scan-month').value = monthVal;
       }
-      
+
       const [year, month] = monthVal.split('-').map(Number);
       const existing = state.bank_records.find(r => r.year === year && r.month === month);
-      
+
       bankEditorBuffer = existing ? JSON.parse(JSON.stringify(existing.transactions)) : [
         { id: generateId('tx'), date: `${monthVal}-01`, type: 'expense', amount: 0, description: '', category: 'purchase' }
       ];
-      
+
       document.getElementById('bank-editor-month-label').textContent = monthVal;
       document.getElementById('bank-editor-title').textContent = '통장 거래 내역 수동 입력 및 편집';
-      
+
       renderBankEditorTable();
       document.getElementById('bank-editor-modal').classList.add('show');
     }
@@ -4522,7 +4705,7 @@ JSON 응답 형식:
     function renderBankEditorTable() {
       const tbody = document.getElementById('bank-editor-tbody');
       tbody.innerHTML = '';
-      
+
       bankEditorBuffer.forEach((tx, idx) => {
         const tr = document.createElement('tr');
         tr.className = 'bank-tx-row';
@@ -4553,7 +4736,7 @@ JSON 응답 형식:
         `;
         tbody.appendChild(tr);
       });
-      
+
       lucide.createIcons();
     }
 
@@ -4561,16 +4744,16 @@ JSON 응답 형식:
       const tbody = document.getElementById('bank-editor-tbody');
       const rows = tbody.querySelectorAll('tr.bank-tx-row');
       const updatedBuffer = [];
-      
+
       rows.forEach((row, index) => {
         const dateInput = row.querySelector('.tx-date');
         const typeSelect = row.querySelector('.tx-type');
         const amountInput = row.querySelector('.tx-amount');
         const descInput = row.querySelector('.tx-desc');
         const catSelect = row.querySelector('.tx-cat');
-        
+
         if (!dateInput) return;
-        
+
         updatedBuffer.push({
           id: bankEditorBuffer[index] ? bankEditorBuffer[index].id : generateId('tx'),
           date: dateInput.value,
@@ -4580,16 +4763,16 @@ JSON 응답 형식:
           category: catSelect.value
         });
       });
-      
+
       bankEditorBuffer = updatedBuffer;
     }
 
     function addBankEditorRow() {
       syncBankBufferFromDOM();
-      
+
       const monthLabel = document.getElementById('bank-editor-month-label').textContent;
       const defaultDate = `${monthLabel}-01`;
-      
+
       bankEditorBuffer.push({
         id: generateId('tx'),
         date: defaultDate,
@@ -4598,7 +4781,7 @@ JSON 응답 형식:
         description: '',
         category: 'purchase'
       });
-      
+
       renderBankEditorTable();
     }
 
@@ -4623,7 +4806,7 @@ JSON 응답 형식:
       const row = inputEl.closest('tr');
       const catSelect = row.querySelector('.tx-cat');
       const typeSelect = row.querySelector('.tx-type');
-      
+
       const val = text.toLowerCase();
       if (val.includes('빙그레') || val.includes('해태') || val.includes('크라운') || val.includes('롯데') || val.includes('유통') || val.includes('대리점') || val.includes('납품') || val.includes('매입')) {
         catSelect.value = 'purchase';
@@ -4642,7 +4825,7 @@ JSON 응답 형식:
 
     function saveBankEditorTransactions() {
       syncBankBufferFromDOM();
-      
+
       let hasError = false;
       bankEditorBuffer.forEach(tx => {
         if (!tx.date) {
@@ -4661,19 +4844,19 @@ JSON 응답 형식:
           return;
         }
       });
-      
+
       if (hasError) return;
-      
+
       const targetMonthStr = document.getElementById('bank-editor-month-label').textContent;
       const [year, month] = targetMonthStr.split('-').map(Number);
-      
+
       // Filter out existing record
       state.bank_records = state.bank_records.filter(r => !(r.year === year && r.month === month));
-      
+
       const total_income = bankEditorBuffer.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
       const total_expense = bankEditorBuffer.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
       const net_profit = total_income - total_expense;
-      
+
       state.bank_records.push({
         id: `bank_${year}${String(month).padStart(2, '0')}`,
         year,
@@ -4684,7 +4867,7 @@ JSON 응답 형식:
         net_profit,
         created_at: getTodayString()
       });
-      
+
       saveStateToLocalStorage();
       showToast(`${year}년 ${month}월 통장 내역이 저장되었습니다.`, 'success');
       closeBankEditorModal();
@@ -4696,24 +4879,24 @@ JSON 응답 형식:
     function runReconciliation() {
       const targetMonth = document.getElementById('reconcile-month-filter').value;
       const [year, month] = targetMonth.split('-').map(Number);
-      
+
       // 1. Filter stock ins for this month
       const monthlyStockIns = state.stock_in.filter(s => s.date && s.date.substring(0, 7) === targetMonth);
-      
+
       if (monthlyStockIns.length === 0) {
         showToast('선택한 달에 기록된 입고 영수증(전표)이 없습니다.', 'warning');
-        
+
         // Render empty reconciliation table
         const tbody = document.getElementById('reconciliation-tbody');
         tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 20px;">이 달에 입고된 상품 영수증이 존재하지 않습니다.</td></tr>`;
-        
+
         document.getElementById('recon-stat-total').textContent = '0건';
         document.getElementById('recon-stat-matched').textContent = '0건';
         document.getElementById('recon-stat-diff').textContent = '0건';
         document.getElementById('recon-stat-unmatched').textContent = '0건';
         return;
       }
-      
+
       // 2. Group stock ins by photo_ref (receipt representation) or unique identifier
       const receiptsMap = {};
       monthlyStockIns.forEach(s => {
@@ -4742,55 +4925,55 @@ JSON 응답 형식:
         const prodName = prod ? prod.name : '알 수 없음';
         receiptsMap[key].items.push(`${prodName} (${s.quantity}개)`);
       });
-      
+
       const receipts = Object.values(receiptsMap);
-      
+
       // 3. Find bank record for this month
       const bankRecord = state.bank_records.find(r => r.year === year && r.month === month);
       const bankTxs = bankRecord ? bankRecord.transactions : [];
-      
+
       const matchedTxIds = new Set();
       const reconResults = [];
-      
+
       // Sort receipts by date
       receipts.sort((a, b) => a.date.localeCompare(b.date));
-      
+
       receipts.forEach(receipt => {
         let bestMatch = null;
         let minDiffScore = Infinity;
-        
+
         // Find candidates: date +/-3 days, amount +/-5%
         const candidates = bankTxs.filter(tx => {
           if (tx.type !== 'expense') return false;
           if (matchedTxIds.has(tx.id)) return false;
-          
+
           const dayDiff = getDayDifference(receipt.date, tx.date);
           if (Math.abs(dayDiff) > 3) return false;
-          
+
           const amtDiffPct = Math.abs(receipt.amount - tx.amount) / receipt.amount;
           if (amtDiffPct > 0.05) return false;
-          
+
           return true;
         });
-        
+
         candidates.forEach(tx => {
           // Score = supplier name matching bonus + date proximity + amount proximity
           const hasDescMatch = tx.description.toLowerCase().includes(receipt.supplierName.split(' ')[0].toLowerCase()) ? 0 : 40;
           const dayDiff = Math.abs(getDayDifference(receipt.date, tx.date));
           const amtDiffPct = Math.abs(receipt.amount - tx.amount) / receipt.amount * 100;
-          
+
           const score = hasDescMatch + dayDiff * 10 + amtDiffPct * 5;
           if (score < minDiffScore) {
             minDiffScore = score;
             bestMatch = tx;
           }
         });
-        
+
         if (bestMatch) {
           matchedTxIds.add(bestMatch.id);
           const amtDiff = receipt.amount - bestMatch.amount;
           const status = amtDiff === 0 ? 'matched' : 'diff';
-          
+
           reconResults.push({
             status,
             receiptKey: receipt.key,
@@ -4820,25 +5003,25 @@ JSON 응답 형식:
           });
         }
       });
-      
+
       // 4. Update Stats counters in UI
       const totalCount = reconResults.length;
       const matchedCount = reconResults.filter(r => r.status === 'matched').length;
       const diffCount = reconResults.filter(r => r.status === 'diff').length;
       const unmatchedCount = reconResults.filter(r => r.status === 'unmatched').length;
-      
+
       document.getElementById('recon-stat-total').textContent = `${totalCount}건`;
       document.getElementById('recon-stat-matched').textContent = `${matchedCount}건`;
       document.getElementById('recon-stat-diff').textContent = `${diffCount}건`;
       document.getElementById('recon-stat-unmatched').textContent = `${unmatchedCount}건`;
-      
+
       // 5. Render list in tbody
       const tbody = document.getElementById('reconciliation-tbody');
       tbody.innerHTML = '';
-      
+
       reconResults.forEach(r => {
         const tr = document.createElement('tr');
-        
+
         let statusBadge = '';
         if (r.status === 'matched') {
           statusBadge = `<span class="badge badge-success">✅ 일치</span>`;
@@ -4847,17 +5030,17 @@ JSON 응답 형식:
         } else {
           statusBadge = `<span class="badge badge-danger">❌ 통장 누락</span>`;
         }
-        
-        const diffText = r.difference === 0 
-          ? `<span style="color: var(--text-muted);">-</span>` 
-          : (r.difference > 0 
-              ? `<span style="color: var(--success); font-weight: 700;">+₩${r.difference.toLocaleString()}</span>` 
-              : `<span style="color: var(--danger); font-weight: 700;">-₩${Math.abs(r.difference).toLocaleString()}</span>`);
-              
-        const bankAmtText = r.txAmount > 0 
-          ? `₩${r.txAmount.toLocaleString()}` 
+
+        const diffText = r.difference === 0
+          ? `<span style="color: var(--text-muted);">-</span>`
+          : (r.difference > 0
+            ? `<span style="color: var(--success); font-weight: 700;">+₩${r.difference.toLocaleString()}</span>`
+            : `<span style="color: var(--danger); font-weight: 700;">-₩${Math.abs(r.difference).toLocaleString()}</span>`);
+
+        const bankAmtText = r.txAmount > 0
+          ? `₩${r.txAmount.toLocaleString()}`
           : `<span style="color: var(--text-muted);">-</span>`;
-          
+
         tr.innerHTML = `
           <td>${statusBadge}</td>
           <td>${r.receiptDate}</td>
@@ -4880,7 +5063,7 @@ JSON 응답 형식:
         `;
         tbody.appendChild(tr);
       });
-      
+
       showToast(`대사가 완료되었습니다. (일치: ${matchedCount}, 누락: ${unmatchedCount})`, 'success');
     }
 
@@ -4892,11 +5075,11 @@ JSON 응답 형식:
     function exportDataBackup() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
       const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href",     dataStr);
-      
+      downloadAnchor.setAttribute("href", dataStr);
+
       const dateStr = getTodayString().replace(/-/g, '');
       downloadAnchor.setAttribute("download", `funnysnak_backup_${dateStr}.json`);
-      
+
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -4910,10 +5093,10 @@ JSON 응답 형식:
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         try {
           const imported = JSON.parse(e.target.result);
-          
+
           // Verify critical properties
           if (imported.products && imported.inventory && imported.suppliers && imported.categories) {
             state = imported;
@@ -4922,7 +5105,7 @@ JSON 응답 형식:
             }
             saveStateToLocalStorage();
             showToast('데이터 복원이 완료되었습니다!', 'success');
-            
+
             // Reload all UI elements
             populateFormDropdowns();
             adaptCategoriesBySupplier();
@@ -4933,7 +5116,7 @@ JSON 응답 형식:
             renderCategoriesList();
             loadConfigToUI();
             updateDashboardAnalytics();
-            
+
             // Reload finance tab if defined
             if (typeof renderFinanceTab === 'function') {
               renderFinanceTab();
@@ -4968,12 +5151,12 @@ JSON 응답 형식:
 
       // Convert inventory objects to spreadsheet-friendly layout
       const today = new Date();
-      today.setHours(0,0,0,0);
+      today.setHours(0, 0, 0, 0);
 
       const rows = state.inventory.filter(i => i.current_qty > 0).map(inv => {
         const prod = state.products.find(p => p.id === inv.product_id);
         const supplier = state.suppliers.find(s => s.id === (prod?.supplier_id || ''));
-        
+
         // Find matching stock-in to query purchase price
         const matchingStockIn = state.stock_in.filter(s => s.product_id === inv.product_id && s.expiry_date === inv.expiry_date);
         const purchasePrice = matchingStockIn.length > 0 ? matchingStockIn[0].purchase_price : 0;
@@ -5091,7 +5274,7 @@ JSON 응답 형식:
       saveStateToLocalStorage();
       nameInput.value = '';
       showToast(`납품처 [${name}] 추가되었습니다.`, 'success');
-      
+
       renderSuppliersList();
       populateFormDropdowns();
     }
@@ -5108,7 +5291,7 @@ JSON 응답 형식:
         state.suppliers = state.suppliers.filter(s => s.id !== id);
         saveStateToLocalStorage();
         showToast('납품처가 삭제되었습니다.');
-        
+
         renderSuppliersList();
         populateFormDropdowns();
       }
@@ -5165,7 +5348,7 @@ JSON 응답 형식:
       nameInput.value = '';
       colorInput.value = '#3b82f6';
       showToast(`카테고리 [${name}] 추가되었습니다.`, 'success');
-      
+
       renderCategoriesList();
       populateFormDropdowns();
       adaptCategoriesBySupplier();
@@ -5184,7 +5367,7 @@ JSON 응답 형식:
         state.categories = state.categories.filter(c => c.id !== id);
         saveStateToLocalStorage();
         showToast('카테고리가 삭제되었습니다.');
-        
+
         renderCategoriesList();
         populateFormDropdowns();
         adaptCategoriesBySupplier();
@@ -5193,4 +5376,5 @@ JSON 응답 형식:
     }
   </script>
 </body>
+
 </html>
