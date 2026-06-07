@@ -3041,7 +3041,7 @@ JSON 응답 형식:
 }
         `;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -3230,35 +3230,71 @@ JSON 응답 형식:
       }
     }
 
-    function saveVerificationDraft() {
+    async function saveVerificationDraft() {
       if (!aiExtractedBuffer || aiExtractedBuffer.length === 0) {
         showToast('임시 저장할 내역이 없습니다.', 'warning');
         return;
       }
       state.draft_buffer = [...aiExtractedBuffer];
       saveStateToLocalStorage();
-      showToast(`분석 내역 ${state.draft_buffer.length}건이 임시 저장되었습니다. 다른 기기(PC 등)에서 불러올 수 있습니다.`, 'success');
+
+      // Attempt to save to SQLite database server
+      try {
+        const response = await fetch('/api/draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: state.draft_buffer })
+        });
+        if (response.ok) {
+          showToast(`분석 내역 ${state.draft_buffer.length}건이 로컬 DB에 임시 저장되었습니다. 타 기기에서 실시간 동기화하여 불러올 수 있습니다.`, 'success');
+        } else {
+          showToast('로컬 DB 저장에 실패하여 기기 내(localStorage)에만 임시 저장되었습니다.', 'warning');
+        }
+      } catch (err) {
+        showToast('서버 연결 실패로 기기 내(localStorage)에 임시 저장되었습니다.', 'warning');
+      }
+
       checkDraftStatus();
     }
 
-    function loadDraftToVerification() {
-      if (!state.draft_buffer || state.draft_buffer.length === 0) {
+    async function loadDraftToVerification() {
+      // Attempt to load from SQLite database first
+      let loadedItems = null;
+      try {
+        const response = await fetch('/api/draft');
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData && resData.items && resData.items.length > 0) {
+            loadedItems = resData.items;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not load from DB server, using local fallback:', err);
+      }
+
+      // Fallback to state.draft_buffer (localStorage) if server fetch failed or returned empty
+      if (!loadedItems) {
+        if (state.draft_buffer && state.draft_buffer.length > 0) {
+          loadedItems = state.draft_buffer;
+        }
+      }
+
+      if (!loadedItems || loadedItems.length === 0) {
         showToast('임시 저장된 내역이 없습니다.', 'warning');
         return;
       }
-      // Re-populate verification card with draft contents
-      showToast('임시 저장된 분석 내역을 불러왔습니다.', 'success');
-      showVerificationCard(state.draft_buffer);
-      // Synchronize aiExtractedBuffer values to ensure fields loaded from saved state are correct
-      aiExtractedBuffer = [...state.draft_buffer];
 
+      showToast('임시 저장된 분석 내역을 불러왔습니다.', 'success');
+      showVerificationCard(loadedItems);
+      aiExtractedBuffer = [...loadedItems];
+      
       // Update DOM values to match the restored buffer state
       aiExtractedBuffer.forEach(item => {
         const row = document.getElementById(`verification-row-${item.tempId}`);
         if (row) {
           const inputs = row.querySelectorAll('input');
           const selects = row.querySelectorAll('select');
-
+          
           if (selects[0]) selects[0].value = item.supplier_id;
           if (selects[1]) selects[1].value = item.category;
           if (inputs[0]) inputs[0].value = item.name;
@@ -3266,20 +3302,39 @@ JSON 응답 형식:
           if (inputs[2]) inputs[2].value = item.purchase_price;
           if (inputs[3]) inputs[3].value = item.selling_price || '';
           if (inputs[4]) inputs[4].value = item.expiry_date || '';
-
+          
           recalcRowProfit(item.tempId);
         }
       });
     }
 
-    function checkDraftStatus() {
+    async function checkDraftStatus() {
       const btn = document.getElementById('btn-load-draft');
-      if (btn) {
-        if (state.draft_buffer && state.draft_buffer.length > 0) {
-          btn.style.display = 'inline-flex';
-        } else {
-          btn.style.display = 'none';
+      if (!btn) return;
+
+      // Check server database first
+      let hasDraft = false;
+      try {
+        const response = await fetch('/api/draft');
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData && resData.items && resData.items.length > 0) {
+            hasDraft = true;
+          }
         }
+      } catch (err) {
+        // network issue or offline
+      }
+
+      // Local storage check fallback
+      if (!hasDraft && state.draft_buffer && state.draft_buffer.length > 0) {
+        hasDraft = true;
+      }
+
+      if (hasDraft) {
+        btn.style.display = 'inline-flex';
+      } else {
+        btn.style.display = 'none';
       }
     }
 
