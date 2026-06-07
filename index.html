@@ -3238,52 +3238,30 @@ JSON 응답 형식:
       state.draft_buffer = [...aiExtractedBuffer];
       saveStateToLocalStorage();
 
-      // Generate a random 4-digit key for remote sharing
-      const shareKey = Math.floor(1000 + Math.random() * 9000).toString();
-      
+      // Attempt to save to SQLite database server
       try {
-        // Use a reliable, free, public key-value sync service (kvstore / bin)
-        // We will store it on a public, serverless JSON bin service
-        const response = await fetch(`https://api.jsonbin.it/v1/bins/${shareKey}`, {
-          method: 'PUT',
+        const response = await fetch('/api/draft', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: state.draft_buffer })
         });
-        
-        // Show success alert with the 4-digit code
-        alert(`🎉 임시 저장 성공!\n\n공유 키코드: ${shareKey}\n\nPC 브라우저의 [임시저장 불러오기] 단추를 누르고 위 4자리 번호를 입력하시면 실시간으로 분석 내역이 불러와집니다.`);
-        showToast(`분석 내역이 공유 키코드 [${shareKey}]로 임시 저장되었습니다.`, 'success');
-        
-        // Save share key locally as well
-        localStorage.setItem('funny_last_share_key', shareKey);
+        if (response.ok) {
+          showToast(`분석 내역 ${state.draft_buffer.length}건이 로컬 DB에 임시 저장되었습니다. 타 기기에서 실시간 동기화하여 불러올 수 있습니다.`, 'success');
+        } else {
+          showToast('로컬 DB 저장에 실패하여 기기 내(localStorage)에만 임시 저장되었습니다.', 'warning');
+        }
       } catch (err) {
-        console.error(err);
-        showToast('온라인 임시 저장 실패. 기기 내(localStorage)에만 임시 저장되었습니다.', 'warning');
+        showToast('서버 연결 실패로 기기 내(localStorage)에 임시 저장되었습니다.', 'warning');
       }
 
       checkDraftStatus();
     }
 
     async function loadDraftToVerification() {
-      const lastKey = localStorage.getItem('funny_last_share_key') || '';
-      const shareKey = prompt('폰에서 발급받은 임시저장 4자리 키코드를 입력해 주세요:', lastKey);
-      if (!shareKey) return;
-
-      const trimmedKey = shareKey.trim();
-      if (trimmedKey.length !== 4 || isNaN(trimmedKey)) {
-        showToast('올바른 4자리 숫자를 입력해 주세요.', 'warning');
-        return;
-      }
-
+      // Attempt to load from SQLite database first
       let loadedItems = null;
-      const loader = document.getElementById('ai-loading');
-      if (loader) {
-        loader.querySelector('div:nth-of-type(2)').textContent = '임시 저장된 데이터를 동기화 중...';
-        loader.style.display = 'flex';
-      }
-
       try {
-        const response = await fetch(`https://api.jsonbin.it/v1/bins/${trimmedKey}`);
+        const response = await fetch('/api/draft');
         if (response.ok) {
           const resData = await response.json();
           if (resData && resData.items && resData.items.length > 0) {
@@ -3291,26 +3269,22 @@ JSON 응답 형식:
           }
         }
       } catch (err) {
-        console.warn('Could not sync from remote server:', err);
-      } finally {
-        if (loader) {
-          loader.style.display = 'none';
-          loader.querySelector('div:nth-of-type(2)').textContent = 'Gemini AI가 이미지를 분석 중입니다...';
+        console.warn('Could not load from DB server, using local fallback:', err);
+      }
+
+      // Fallback to state.draft_buffer (localStorage) if server fetch failed or returned empty
+      if (!loadedItems) {
+        if (state.draft_buffer && state.draft_buffer.length > 0) {
+          loadedItems = state.draft_buffer;
         }
       }
 
-      // Fallback to local storage if remote fetch failed or returned nothing
-      if (!loadedItems && state.draft_buffer && state.draft_buffer.length > 0) {
-        loadedItems = state.draft_buffer;
-        showToast('서버 데이터를 가져오지 못해 로컬 브라우저 저장소에서 복원했습니다.', 'warning');
-      }
-
       if (!loadedItems || loadedItems.length === 0) {
-        showToast('임시 저장된 내역을 찾을 수 없습니다. 키코드를 다시 확인해 주세요.', 'danger');
+        showToast('임시 저장된 내역이 없습니다.', 'warning');
         return;
       }
 
-      showToast('임시 저장된 분석 내게를 불러왔습니다.', 'success');
+      showToast('임시 저장된 분석 내역을 불러왔습니다.', 'success');
       showVerificationCard(loadedItems);
       aiExtractedBuffer = [...loadedItems];
       
@@ -3334,11 +3308,33 @@ JSON 응답 형식:
       });
     }
 
-    function checkDraftStatus() {
+    async function checkDraftStatus() {
       const btn = document.getElementById('btn-load-draft');
-      if (btn) {
-        // Since it's key-based online retrieval, always show the load button so they can enter the keycode.
+      if (!btn) return;
+
+      // Check server database first
+      let hasDraft = false;
+      try {
+        const response = await fetch('/api/draft');
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData && resData.items && resData.items.length > 0) {
+            hasDraft = true;
+          }
+        }
+      } catch (err) {
+        // network issue or offline
+      }
+
+      // Local storage check fallback
+      if (!hasDraft && state.draft_buffer && state.draft_buffer.length > 0) {
+        hasDraft = true;
+      }
+
+      if (hasDraft) {
         btn.style.display = 'inline-flex';
+      } else {
+        btn.style.display = 'none';
       }
     }
 
