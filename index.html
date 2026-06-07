@@ -25,6 +25,9 @@
   <!-- HTML5-QRCode Scanner for Barcode Scanning -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     /* Premium CSS Design System */
     :root[theme="dark"] {
@@ -1797,6 +1800,22 @@
                 </div>
               </div>
 
+              <div class="form-group" style="margin-top: 16px;">
+                <label for="supabase-url-input">Supabase URL</label>
+                <input type="text" id="supabase-url-input" placeholder="https://xxxxxx.supabase.co">
+              </div>
+
+              <div class="form-group">
+                <label for="supabase-key-input">Supabase Anon Key</label>
+                <div class="input-with-icon">
+                  <input type="password" id="supabase-key-input" placeholder="Supabase Anon Key (Public API Key)">
+                  <button type="button" class="input-icon-btn" onclick="togglePasswordVisibility('supabase-key-input')"
+                    title="비밀번호 보기/숨기기">
+                    <i data-lucide="eye" id="supabase-key-eye"></i>
+                  </button>
+                </div>
+              </div>
+
               <div class="form-group">
                 <label for="expiry-threshold">유통기한 위험 경고일 기준 (일)</label>
                 <input type="number" id="expiry-threshold" value="7" min="1" max="90" placeholder="기본 7일">
@@ -2174,7 +2193,9 @@
       draft_buffer: [],
       settings: {
         gemini_api_key: '',
-        alert_threshold: 7
+        alert_threshold: 7,
+        supabase_url: '',
+        supabase_key: ''
       }
     };
 
@@ -2356,10 +2377,143 @@
       renderRecentStockIns();
       renderFavoritesList();
       updateDashboardAnalytics();
+      
+      // Initialize Supabase Client if credentials are saved
+      if (state.settings.supabase_url && state.settings.supabase_key) {
+        initSupabaseClient();
+        syncDataFromSupabase();
+      }
+      
       checkDraftStatus();
     }
 
-    function saveStateToLocalStorage() {
+    let supabaseClient = null;
+
+    function initSupabaseClient() {
+      const url = state.settings.supabase_url;
+      const key = state.settings.supabase_key;
+      if (url && key && typeof supabase !== 'undefined') {
+        supabaseClient = supabase.createClient(url, key);
+        console.log('Supabase client initialized successfully.');
+      }
+    }
+
+    async function syncDataFromSupabase() {
+      if (!supabaseClient) return;
+      try {
+        console.log('Syncing data from Supabase...');
+        
+        // Fetch suppliers
+        const { data: sups, error: err1 } = await supabaseClient.from('suppliers').select('*');
+        if (!err1 && sups) {
+          state.suppliers = sups;
+        }
+
+        // Fetch categories
+        const { data: cats, error: err2 } = await supabaseClient.from('categories').select('*');
+        if (!err2 && cats) {
+          state.categories = cats;
+        }
+
+        // Fetch products
+        const { data: prods, error: err3 } = await supabaseClient.from('products').select('*');
+        if (!err3 && prods) {
+          state.products = prods.map(p => ({
+            ...p,
+            is_favorite: p.is_favorite || false
+          }));
+        }
+
+        // Fetch stock_in
+        const { data: stockIn, error: err4 } = await supabaseClient.from('stock_in').select('*');
+        if (!err4 && stockIn) {
+          state.stock_in = stockIn;
+        }
+
+        // Fetch inventory
+        const { data: inv, error: err5 } = await supabaseClient.from('inventory').select('*');
+        if (!err5 && inv) {
+          state.inventory = inv;
+        }
+
+        // Fetch bank_records
+        const { data: bank, error: err6 } = await supabaseClient.from('bank_records').select('*');
+        if (!err6 && bank) {
+          state.bank_records = bank;
+        }
+
+        saveStateToLocalStorageOnly();
+        
+        // Update UI
+        populateFormDropdowns();
+        adaptCategoriesBySupplier();
+        renderInventory();
+        renderSuppliersList();
+        renderCategoriesList();
+        renderRecentStockIns();
+        renderFavoritesList();
+        updateDashboardAnalytics();
+        checkDraftStatus();
+        
+        console.log('Supabase sync complete.');
+      } catch (e) {
+        console.error('Error syncing from Supabase:', e);
+      }
+    }
+
+    async function pushDataToSupabase(table, data) {
+      if (!supabaseClient) return;
+      try {
+        if (table === 'inventory') {
+          await supabaseClient.from('inventory').delete().neq('product_id', 'dummy');
+          if (data && data.length > 0) {
+            await supabaseClient.from('inventory').insert(data);
+          }
+        } else if (table === 'bank_records') {
+          await supabaseClient.from('bank_records').delete().neq('id', 'dummy');
+          if (data && data.length > 0) {
+            await supabaseClient.from('bank_records').insert(data);
+          }
+        } else if (table === 'stock_in') {
+          await supabaseClient.from('stock_in').delete().neq('id', 'dummy');
+          if (data && data.length > 0) {
+            await supabaseClient.from('stock_in').insert(data);
+          }
+        } else if (table === 'products') {
+          await supabaseClient.from('products').delete().neq('id', 'dummy');
+          if (data && data.length > 0) {
+            await supabaseClient.from('products').insert(data.map(p => ({
+              id: p.id,
+              name: p.name,
+              category: p.category,
+              supplier_id: p.supplier_id,
+              selling_price: p.selling_price,
+              barcode: p.barcode,
+              is_favorite: p.is_favorite,
+              note: p.note
+            })));
+          }
+        } else if (table === 'suppliers') {
+          await supabaseClient.from('suppliers').delete().neq('id', 'dummy');
+          if (data && data.length > 0) {
+            await supabaseClient.from('suppliers').insert(data.map(s => ({
+              id: s.id,
+              name: s.name,
+              category_types: s.category_types
+            })));
+          }
+        } else if (table === 'categories') {
+          await supabaseClient.from('categories').delete().neq('id', 'dummy');
+          if (data && data.length > 0) {
+            await supabaseClient.from('categories').insert(data);
+          }
+        }
+      } catch (err) {
+        console.error(`Error pushing data to Supabase table ${table}:`, err);
+      }
+    }
+
+    function saveStateToLocalStorageOnly() {
       localStorage.setItem('funny_products', JSON.stringify(state.products));
       localStorage.setItem('funny_stock_in', JSON.stringify(state.stock_in));
       localStorage.setItem('funny_inventory', JSON.stringify(state.inventory));
@@ -2368,6 +2522,20 @@
       localStorage.setItem('funny_settings', JSON.stringify(state.settings));
       localStorage.setItem('funny_bank_records', JSON.stringify(state.bank_records));
       localStorage.setItem('funny_draft_buffer', JSON.stringify(state.draft_buffer || []));
+    }
+
+    function saveStateToLocalStorage() {
+      saveStateToLocalStorageOnly();
+
+      // Asynchronously push updates to Supabase
+      if (supabaseClient) {
+        pushDataToSupabase('suppliers', state.suppliers);
+        pushDataToSupabase('categories', state.categories);
+        pushDataToSupabase('products', state.products);
+        pushDataToSupabase('stock_in', state.stock_in);
+        pushDataToSupabase('inventory', state.inventory);
+        pushDataToSupabase('bank_records', state.bank_records);
+      }
     }
 
     // Helper: format today's date YYYY-MM-DD
