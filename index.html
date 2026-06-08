@@ -1031,15 +1031,50 @@
 
 <body>
 
+  <!-- Premium Login Overlay -->
+  <div id="login-overlay" style="position: fixed; inset: 0; width: 100vw; height: 100vh; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(12px);">
+    <div class="glass-card" style="width: 100%; max-width: 420px; padding: 40px 30px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); text-align: center; border-radius: 24px; animation: modalSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.175);">
+      <div class="logo-icon" style="width: 60px; height: 60px; font-size: 24px; border-radius: 18px; margin: 0 auto 20px auto; font-weight: 900;">FS</div>
+      <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px; background: linear-gradient(to right, var(--text), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">퍼니스낵 재고관리</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 32px;">관리자 계정으로 로그인해 주세요.</p>
+      
+      <form id="login-form" onsubmit="handleLoginSubmit(event)">
+        <div class="form-group" style="text-align: left; margin-bottom: 16px;">
+          <label for="login-email" style="margin-left: 4px;">이메일 주소</label>
+          <input type="email" id="login-email" required placeholder="example@email.com" style="padding: 14px 16px;">
+        </div>
+        <div class="form-group" style="text-align: left; margin-bottom: 24px;">
+          <label for="login-password" style="margin-left: 4px;">비밀번호</label>
+          <div class="input-with-icon">
+            <input type="password" id="login-password" required placeholder="••••••" style="padding: 14px 16px;">
+            <button type="button" class="input-icon-btn" onclick="togglePasswordVisibility('login-password')" style="top: 50%;">
+              <i data-lucide="eye" id="login-password-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px; border-radius: 14px;">
+          <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
+          <span>로그인</span>
+        </button>
+      </form>
+      <div id="login-error-msg" style="margin-top: 16px; font-size: 13px; color: var(--danger); font-weight: 600; display: none;"></div>
+    </div>
+  </div>
+
   <!-- Mobile Header -->
   <header class="mobile-header">
     <div class="logo-container" style="margin-bottom: 0;">
       <div class="logo-icon">FS</div>
       <span class="logo-text">퍼니스낵 재고관리</span>
     </div>
-    <button class="theme-toggle-btn btn-icon-only" onclick="toggleTheme()" aria-label="테마 전환">
-      <i data-lucide="sun" id="mobile-theme-icon"></i>
-    </button>
+    <div style="display: flex; gap: 8px;">
+      <button class="theme-toggle-btn btn-icon-only" onclick="toggleTheme()" aria-label="테마 전환">
+        <i data-lucide="sun" id="mobile-theme-icon"></i>
+      </button>
+      <button class="btn btn-secondary btn-icon-only btn-sm" onclick="handleLogout()" aria-label="로그아웃" style="padding: 10px;">
+        <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+      </button>
+    </div>
   </header>
 
   <!-- App Wrapper -->
@@ -1077,9 +1112,13 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button class="theme-toggle-btn" onclick="toggleTheme()">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" style="margin-bottom: 8px;">
           <span>화면 모드</span>
           <i data-lucide="sun" id="sidebar-theme-icon"></i>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="handleLogout()" style="width: 100%; justify-content: center; gap: 8px; margin-bottom: 12px;">
+          <i data-lucide="log-out" style="width: 14px; height: 14px;"></i>
+          <span>로그아웃</span>
         </button>
         <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
           v1.0.0 &copy; 2026 FunnySnack
@@ -2658,8 +2697,91 @@
       });
     }
 
+    // --- Supabase Auth handlers ---
+    async function handleLoginSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorMsg = document.getElementById('login-error-msg');
+      errorMsg.style.display = 'none';
+
+      if (!supabaseClient) {
+        // Fallback or alert setup first
+        const urlInput = state.settings.supabase_url;
+        const keyInput = state.settings.supabase_key;
+        if (!urlInput || !keyInput) {
+          errorMsg.textContent = '설정 탭에서 Supabase URL과 Key를 먼저 구성해 주세요! (또는 로컬 모드)';
+          errorMsg.style.display = 'block';
+          return;
+        }
+        initSupabaseClient();
+      }
+
+      if (!supabaseClient) {
+        errorMsg.textContent = 'Supabase 연결에 실패했습니다. 키 설정을 확인해 주세요.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (error) {
+          errorMsg.textContent = `로그인 실패: ${error.message}`;
+          errorMsg.style.display = 'block';
+        } else if (data && data.user) {
+          showToast('성공적으로 로그인되었습니다.', 'success');
+          document.getElementById('login-overlay').style.display = 'none';
+          
+          // Re-sync all user data from database
+          await syncDataFromSupabase();
+        }
+      } catch (err) {
+        errorMsg.textContent = '네트워크 오류가 발생했습니다.';
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    async function handleLogout() {
+      if (confirm('로그아웃 하시겠습니까?')) {
+        if (supabaseClient) {
+          await supabaseClient.auth.signOut();
+        }
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('login-password').value = '';
+        showToast('로그아웃되었습니다.');
+      }
+    }
+
+    async function checkAuthSession() {
+      if (!supabaseClient) {
+        // Show login if Supabase configuration is missing or needs setup
+        if (!state.settings.supabase_url || !state.settings.supabase_key) {
+          // If no supabase credentials, allow local simulation but prompt setup
+          document.getElementById('login-overlay').style.display = 'none';
+          return;
+        }
+        initSupabaseClient();
+      }
+
+      if (supabaseClient) {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        if (session && session.user) {
+          document.getElementById('login-overlay').style.display = 'none';
+          await syncDataFromSupabase();
+        } else {
+          document.getElementById('login-overlay').style.display = 'flex';
+        }
+      } else {
+        document.getElementById('login-overlay').style.display = 'none';
+      }
+    }
+
     // Set initial theme on load
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       const storedTheme = localStorage.getItem('funny_theme') || 'dark';
       document.documentElement.setAttribute('theme', storedTheme);
       updateThemeIcons(storedTheme);
@@ -2668,6 +2790,9 @@
       initDragAndDrop();
       document.getElementById('stock-expiry-date').value = '';
       lucide.createIcons();
+
+      // Check user authentication
+      await checkAuthSession();
     });
 
     // ==========================================
