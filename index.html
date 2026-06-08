@@ -3531,45 +3531,15 @@ JSON 응답 형식:
       state.draft_buffer = [...aiExtractedBuffer];
       saveStateToLocalStorage();
 
-      // Attempt to save to SQLite database server
-      try {
-        const response = await fetch('/api/draft', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: state.draft_buffer })
-        });
-        if (response.ok) {
-          showToast(`분석 내역 ${state.draft_buffer.length}건이 로컬 DB에 임시 저장되었습니다. 타 기기에서 실시간 동기화하여 불러올 수 있습니다.`, 'success');
-        } else {
-          showToast('로컬 DB 저장에 실패하여 기기 내(localStorage)에만 임시 저장되었습니다.', 'warning');
-        }
-      } catch (err) {
-        showToast('서버 연결 실패로 기기 내(localStorage)에 임시 저장되었습니다.', 'warning');
-      }
+      showToast(`분석 내역 ${state.draft_buffer.length}건이 기기 내(localStorage)에 임시 저장되었습니다.`, 'success');
 
       checkDraftStatus();
     }
 
     async function loadDraftToVerification() {
-      // Attempt to load from SQLite database first
       let loadedItems = null;
-      try {
-        const response = await fetch('/api/draft');
-        if (response.ok) {
-          const resData = await response.json();
-          if (resData && resData.items && resData.items.length > 0) {
-            loadedItems = resData.items;
-          }
-        }
-      } catch (err) {
-        console.warn('Could not load from DB server, using local fallback:', err);
-      }
-
-      // Fallback to state.draft_buffer (localStorage) if server fetch failed or returned empty
-      if (!loadedItems) {
-        if (state.draft_buffer && state.draft_buffer.length > 0) {
-          loadedItems = state.draft_buffer;
-        }
+      if (state.draft_buffer && state.draft_buffer.length > 0) {
+        loadedItems = state.draft_buffer;
       }
 
       if (!loadedItems || loadedItems.length === 0) {
@@ -3605,24 +3575,7 @@ JSON 응답 형식:
       const btn = document.getElementById('btn-load-draft');
       if (!btn) return;
 
-      // Check server database first
-      let hasDraft = false;
-      try {
-        const response = await fetch('/api/draft');
-        if (response.ok) {
-          const resData = await response.json();
-          if (resData && resData.items && resData.items.length > 0) {
-            hasDraft = true;
-          }
-        }
-      } catch (err) {
-        // network issue or offline
-      }
-
-      // Local storage check fallback
-      if (!hasDraft && state.draft_buffer && state.draft_buffer.length > 0) {
-        hasDraft = true;
-      }
+      let hasDraft = state.draft_buffer && state.draft_buffer.length > 0;
 
       if (hasDraft) {
         btn.style.display = 'inline-flex';
