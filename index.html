@@ -3338,6 +3338,10 @@ JSON 응답 형식:
         });
 
         if (!response.ok) {
+          let errBody = '';
+          try { errBody = await response.text(); } catch(_) {}
+          const errDetail = `status: ${response.status}\nurl: ${response.url}\nbody: ${errBody.slice(0, 300)}`;
+          alert(`[AI 분석 오류 상세]\n${errDetail}`);
           throw new Error(`API 오류: ${response.status}`);
         }
 
