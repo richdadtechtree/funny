@@ -1204,11 +1204,6 @@
                   <i data-lucide="sparkles"></i>
                   <span>AI 분석 시작하기</span>
                 </button>
-                <button id="btn-load-draft" class="btn btn-secondary" style="display: none;"
-                  onclick="loadDraftToVerification()" title="임시 저장된 분석 내역 불러오기">
-                  <i data-lucide="folder-open" style="color: var(--primary);"></i>
-                  <span>임시저장 불러오기</span>
-                </button>
               </div>
 
               <div id="ai-loading" class="spinner-overlay" style="display: none;">
@@ -1367,13 +1362,7 @@
 
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 12px; color: var(--text-muted);">
-              ※ 수정 중인 내역을 '임시 저장' 해두고 나중에 불러올 수 있습니다. (폰에서 촬영 후 PC에서 작업 시 유용)
-            </div>
             <div style="display: flex; gap: 12px;">
-              <button class="btn btn-secondary" onclick="saveVerificationDraft()">
-                <i data-lucide="save" style="width:16px; height:16px; color:var(--primary);"></i>
-                <span>임시 저장</span>
-              </button>
               <button class="btn btn-secondary" onclick="closeVerificationCard()">취소</button>
               <button class="btn btn-accent" onclick="saveAllVerifiedItems()">검증된 품목 일괄 저장</button>
             </div>
@@ -2423,7 +2412,6 @@
         syncDataFromSupabase();
       }
       
-      checkDraftStatus();
     }
 
     let supabaseClient = null;
@@ -2492,7 +2480,6 @@
         renderRecentStockIns();
         renderFavoritesList();
         updateDashboardAnalytics();
-        checkDraftStatus();
         
         console.log('Supabase sync complete.');
       } catch (e) {
@@ -3523,19 +3510,6 @@ JSON 응답 형식:
       }
     }
 
-    async function saveVerificationDraft() {
-      if (!aiExtractedBuffer || aiExtractedBuffer.length === 0) {
-        showToast('임시 저장할 내역이 없습니다.', 'warning');
-        return;
-      }
-      state.draft_buffer = [...aiExtractedBuffer];
-      saveStateToLocalStorage();
-
-      showToast(`분석 내역 ${state.draft_buffer.length}건이 기기 내(localStorage)에 임시 저장되었습니다.`, 'success');
-
-      checkDraftStatus();
-    }
-
     async function loadDraftToVerification() {
       let loadedItems = null;
       if (state.draft_buffer && state.draft_buffer.length > 0) {
@@ -3569,19 +3543,6 @@ JSON 응답 형식:
           recalcRowProfit(item.tempId);
         }
       });
-    }
-
-    async function checkDraftStatus() {
-      const btn = document.getElementById('btn-load-draft');
-      if (!btn) return;
-
-      let hasDraft = state.draft_buffer && state.draft_buffer.length > 0;
-
-      if (hasDraft) {
-        btn.style.display = 'inline-flex';
-      } else {
-        btn.style.display = 'none';
-      }
     }
 
     function closeVerificationCard() {
@@ -3648,7 +3609,6 @@ JSON 응답 형식:
       showToast(`총 ${aiExtractedBuffer.length}개 품목이 재고에 추가되었습니다.`, 'success');
 
       closeVerificationCard();
-      checkDraftStatus();
       renderRecentStockIns();
       renderFavoritesList();
       updateDashboardAnalytics();
