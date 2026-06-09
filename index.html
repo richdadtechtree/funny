@@ -3340,8 +3340,11 @@ JSON 응답 형식:
         if (!response.ok) {
           let errBody = '';
           try { errBody = await response.text(); } catch(_) {}
-          const errDetail = `status: ${response.status}\nurl: ${response.url}\nbody: ${errBody.slice(0, 300)}`;
-          alert(`[AI 분석 오류 상세]\n${errDetail}`);
+          const errDetail = `status: ${response.status} | url: ${response.url} | body: ${errBody.slice(0, 500)}`;
+          const dbg = document.createElement('div');
+          dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);color:#fff;font-size:13px;padding:20px;z-index:99999;overflow:auto;word-break:break-all;white-space:pre-wrap;';
+          dbg.innerHTML = `<b>[AI 오류 상세 - 캡처해서 보내주세요]</b>\n\n${errDetail}\n\n<button onclick="this.parentNode.remove()" style="margin-top:20px;padding:10px 20px;font-size:16px;">닫기</button>`;
+          document.body.appendChild(dbg);
           throw new Error(`API 오류: ${response.status}`);
         }
 
