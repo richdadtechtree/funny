@@ -3338,14 +3338,17 @@ JSON 응답 형식:
         });
 
         if (!response.ok) {
-          let errBody = '';
-          try { errBody = await response.text(); } catch(_) {}
-          const errDetail = `status: ${response.status} | url: ${response.url} | body: ${errBody.slice(0, 500)}`;
-          const dbg = document.createElement('div');
-          dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);color:#fff;font-size:13px;padding:20px;z-index:99999;overflow:auto;word-break:break-all;white-space:pre-wrap;';
-          dbg.innerHTML = `<b>[AI 오류 상세 - 캡처해서 보내주세요]</b>\n\n${errDetail}\n\n<button onclick="this.parentNode.remove()" style="margin-top:20px;padding:10px 20px;font-size:16px;">닫기</button>`;
-          document.body.appendChild(dbg);
-          throw new Error(`API 오류: ${response.status}`);
+          let errMsg;
+          if (response.status === 429) {
+            errMsg = 'API 무료 할당량 초과 (429)\naistudio.google.com에서 결제 연동하거나 잠시 후 재시도하세요.';
+          } else if (response.status === 403) {
+            errMsg = 'API 키 권한 오류 (403)\nAPI 키를 확인해 주세요.';
+          } else if (response.status === 400) {
+            errMsg = '잘못된 요청 (400)\n이미지 형식이나 크기를 확인해 주세요.';
+          } else {
+            errMsg = `API 오류 (${response.status})`;
+          }
+          throw new Error(errMsg);
         }
 
         const data = await response.json();
